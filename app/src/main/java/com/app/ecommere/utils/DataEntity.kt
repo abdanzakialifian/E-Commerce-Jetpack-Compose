@@ -1,0 +1,141 @@
+package com.app.ecommere.utils
+
+import com.app.ecommere.data.source.local.entity.ProductEntity
+
+object DataEntity {
+    fun populateData(): List<ProductEntity> {
+        val products = mutableListOf<ProductEntity>()
+
+        products.add(
+            ProductEntity(
+                productId = 1,
+                productCode = "MSDP",
+                productName = "Mie Sedap",
+                productPrice = 3000,
+                currency = "Rp",
+                discount = 0,
+                dimension = "3 cm * 5 cm",
+                unit = "PCS"
+            )
+        )
+
+        products.add(
+            ProductEntity(
+                productId = 2,
+                productCode = "DAIA",
+                productName = "Deterjen DAIA",
+                productPrice = 20000,
+                currency = "Rp",
+                discount = 10,
+                dimension = "8 cm * 5 cm",
+                unit = "PCS"
+            )
+        )
+
+        products.add(
+            ProductEntity(
+                productId = 3,
+                productCode = "SKLN",
+                productName = "So Klin Lantai",
+                productPrice = 15000,
+                currency = "Rp",
+                discount = 0,
+                dimension = "9 cm * 5 cm",
+                unit = "PCS"
+            )
+        )
+
+        products.add(
+            ProductEntity(
+                productId = 4,
+                productCode = "KCPSDP",
+                productName = "Kecap Sedap",
+                productPrice = 25000,
+                currency = "Rp",
+                discount = 0,
+                dimension = "8 cm * 2 cm",
+                unit = "PCS"
+            )
+        )
+
+        products.add(
+            ProductEntity(
+                productId = 5,
+                productCode = "MMLMN",
+                productName = "Mama Lemon",
+                productPrice = 10000,
+                currency = "Rp",
+                discount = 5,
+                dimension = "6 cm * 5 cm",
+                unit = "PCS"
+            )
+        )
+
+        products.add(
+            ProductEntity(
+                productId = 6,
+                productCode = "FLRDNA",
+                productName = "Floridina",
+                productPrice = 4000,
+                currency = "Rp",
+                discount = 0,
+                dimension = "5 cm * 2 cm",
+                unit = "PCS"
+            )
+        )
+
+        products.add(
+            ProductEntity(
+                productId = 7,
+                productCode = "SBNGV",
+                productName = "Giv",
+                productPrice = 25000,
+                currency = "Rp",
+                discount = 0,
+                dimension = "6 cm * 4 cm",
+                unit = "PCS"
+            )
+        )
+
+        products.add(
+            ProductEntity(
+                productId = 8,
+                productCode = "KDM",
+                productName = "Kodomo",
+                productPrice = 12000,
+                currency = "Rp",
+                discount = 0,
+                dimension = "5 cm * 2 cm",
+                unit = "PCS"
+            )
+        )
+
+        products.add(
+            ProductEntity(
+                productId = 9,
+                productCode = "NVO",
+                productName = "Nuvo",
+                productPrice = 15000,
+                currency = "Rp",
+                discount = 5,
+                dimension = "5 cm * 4 cm",
+                unit = "PCS"
+            )
+        )
+
+        products.add(
+            ProductEntity(
+                productId = 10,
+                productCode = "JVN",
+                productName = "Teh Javana",
+                productPrice = 3000,
+                currency = "Rp",
+                discount = 0,
+                dimension = "5 cm * 2 cm",
+                unit = "PCS"
+            )
+        )
+
+        return products
+    }
+}
