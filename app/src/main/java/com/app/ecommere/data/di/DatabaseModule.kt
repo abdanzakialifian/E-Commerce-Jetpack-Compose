@@ -14,8 +14,8 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
-import java.util.concurrent.Executors
 import javax.inject.Provider
 import javax.inject.Singleton
 
@@ -29,11 +29,13 @@ class DatabaseModule {
         @ApplicationContext context: Context,
         provider: Provider<ECommerceDao>
     ): ECommerceDatabase {
+        val applicationScope = CoroutineScope(SupervisorJob())
+
         return Room.databaseBuilder(context, ECommerceDatabase::class.java, "ecommerce_db")
             .addCallback(object : RoomDatabase.Callback() {
-                override fun onOpen(db: SupportSQLiteDatabase) {
-                    super.onOpen(db)
-                    Executors.newSingleThreadScheduledExecutor().execute {
+                override fun onCreate(db: SupportSQLiteDatabase) {
+                    super.onCreate(db)
+                    applicationScope.launch(Dispatchers.IO) {
                         provider.get().insertAllProduct(DataEntity.populateData())
                     }
                 }

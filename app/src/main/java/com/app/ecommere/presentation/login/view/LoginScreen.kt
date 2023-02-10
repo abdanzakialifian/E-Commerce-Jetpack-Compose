@@ -43,7 +43,7 @@ fun LoginScreen(
 ) {
     val context = LocalContext.current
 
-    when (val uiState = viewModel.uiState.collectAsStateWithLifecycle().value) {
+    when (val uiState = viewModel.getUserByEmail.collectAsStateWithLifecycle().value) {
         is UiState.Loading -> {}
         is UiState.Success -> {
             if (uiState.data == true) {

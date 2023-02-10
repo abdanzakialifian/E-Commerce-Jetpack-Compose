@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "tb_product")
 data class ProductEntity(
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
     @ColumnInfo("product_id")
     val productId: Int? = null,
 
@@ -29,5 +29,11 @@ data class ProductEntity(
     val dimension: String? = null,
 
     @ColumnInfo("unit")
-    val unit: String? = null
+    val unit: String? = null,
+
+    @ColumnInfo("image_name")
+    val imageName: String? = null,
+
+    @ColumnInfo("description")
+    val description: String? = null
 )

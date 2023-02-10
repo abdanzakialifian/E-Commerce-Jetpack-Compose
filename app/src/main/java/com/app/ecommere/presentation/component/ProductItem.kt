@@ -18,7 +18,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -31,6 +33,7 @@ fun ProductItem(
     image: Painter,
     title: String,
     description: String,
+    discount: String,
     price: String,
     onItemClicked: () -> Unit,
     onAddClicked: () -> Unit
@@ -38,7 +41,7 @@ fun ProductItem(
     Card(modifier = modifier, shape = RoundedCornerShape(10.dp)) {
         Column(modifier = Modifier
             .clickable { onItemClicked() }
-            .padding(10.dp)) {
+            .padding(14.dp)) {
             Image(
                 modifier = Modifier
                     .size(100.dp)
@@ -47,6 +50,7 @@ fun ProductItem(
                 contentDescription = "Image Product"
             )
             Text(
+                modifier = Modifier.padding(top = 6.dp),
                 text = title,
                 fontWeight = FontWeight.Bold,
                 color = Color.Black,
@@ -54,16 +58,27 @@ fun ProductItem(
             )
             Text(text = description, color = Color.Gray, fontSize = 12.sp)
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 18.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(
-                    modifier = Modifier.padding(top = 18.dp),
-                    text = price,
-                    fontWeight = FontWeight.Medium,
-                    color = Color.Black,
-                    fontSize = 12.sp
-                )
+                Column(modifier = Modifier.align(Alignment.Bottom)) {
+                    if (discount != "Rp0") {
+                        Text(
+                            text = discount,
+                            color = Color.Gray,
+                            fontSize = 10.sp,
+                            style = TextStyle(textDecoration = TextDecoration.LineThrough)
+                        )
+                    }
+                    Text(
+                        text = price,
+                        fontWeight = FontWeight.Medium,
+                        color = Color.Black,
+                        fontSize = 12.sp
+                    )
+                }
                 Box(
                     modifier = Modifier
                         .background(
@@ -98,6 +113,7 @@ fun ProductItemPreview() {
             image = painterResource(id = R.drawable.mie_sedap),
             title = "Mie Sedap",
             description = "The winning noddle",
+            discount = "Rp0",
             price = "Rp 2.500",
             onItemClicked = {},
             onAddClicked = {}

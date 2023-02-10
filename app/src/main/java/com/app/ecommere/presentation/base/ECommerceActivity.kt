@@ -15,7 +15,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.app.ecommere.presentation.home.HomeScreen
+import com.app.ecommere.presentation.home.view.HomeScreen
+import com.app.ecommere.presentation.home.viewmodel.HomeViewModel
 import com.app.ecommere.presentation.login.view.LoginScreen
 import com.app.ecommere.presentation.login.viewmodel.LoginViewModel
 import com.app.ecommere.presentation.navigation.Screen
@@ -51,7 +52,7 @@ fun ECommerceApp() {
         composable(route = Screen.SplashScreen.route) {
             SplashScreen(
                 onNavigate = {
-                    navController.navigate(Screen.LoginScreen.route) {
+                    navController.navigate(Screen.HomeScreen.route) {
                         popUpTo(Screen.SplashScreen.route) {
                             inclusive = true
                         }
@@ -82,7 +83,8 @@ fun ECommerceApp() {
             )
         }
         composable(route = Screen.HomeScreen.route) {
-            HomeScreen()
+            val viewModel = hiltViewModel<HomeViewModel>()
+            HomeScreen(viewModel = viewModel)
         }
     }
 }
