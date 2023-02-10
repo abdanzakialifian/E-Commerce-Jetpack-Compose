@@ -30,4 +30,6 @@ class ECommerceUseCaseImpl @Inject constructor(private val eCommerceRepository: 
 
     override fun getProductByProductCode(productCode: String): Flow<Boolean> =
         eCommerceRepository.getProductByProductCode(productCode)
+
+    override fun getCheckoutCount(): Flow<Int> = eCommerceRepository.getCheckoutCount()
 }

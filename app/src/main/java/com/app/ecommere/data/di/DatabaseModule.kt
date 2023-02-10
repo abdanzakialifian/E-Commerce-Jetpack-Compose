@@ -22,20 +22,24 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 class DatabaseModule {
-
     @Provides
     @Singleton
     fun provideDatabase(
         @ApplicationContext context: Context,
         provider: Provider<ECommerceDao>
     ): ECommerceDatabase {
-        val applicationScope = CoroutineScope(SupervisorJob())
-
         return Room.databaseBuilder(context, ECommerceDatabase::class.java, "ecommerce_db")
             .addCallback(object : RoomDatabase.Callback() {
                 override fun onCreate(db: SupportSQLiteDatabase) {
                     super.onCreate(db)
-                    applicationScope.launch(Dispatchers.IO) {
+                    CoroutineScope(SupervisorJob()).launch(Dispatchers.IO) {
+                        provider.get().insertAllProduct(DataEntity.populateData())
+                    }
+                }
+
+                override fun onOpen(db: SupportSQLiteDatabase) {
+                    super.onOpen(db)
+                    CoroutineScope(SupervisorJob()).launch(Dispatchers.IO) {
                         provider.get().insertAllProduct(DataEntity.populateData())
                     }
                 }

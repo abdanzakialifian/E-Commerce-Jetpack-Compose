@@ -39,4 +39,6 @@ class LocalDataSource @Inject constructor(private val eCommerceDao: ECommerceDao
 
     fun getProductByProductCode(productCode: String): Flow<Boolean> =
         eCommerceDao.getProductByProductCode(productCode)
+
+    fun getCheckoutCount(): Flow<Int> = eCommerceDao.getCheckoutCount()
 }

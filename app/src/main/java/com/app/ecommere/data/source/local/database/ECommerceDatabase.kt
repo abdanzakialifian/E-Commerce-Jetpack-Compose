@@ -9,7 +9,7 @@ import com.app.ecommere.data.source.local.entity.RegisterEntity
 
 @Database(
     entities = [RegisterEntity::class, ProductEntity::class, CheckoutEntity::class],
-    version = 1,
+    version = 3,
     exportSchema = true
 )
 abstract class ECommerceDatabase : RoomDatabase() {

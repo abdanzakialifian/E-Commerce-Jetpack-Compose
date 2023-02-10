@@ -42,4 +42,23 @@ object DataMapper {
         subTotal = input.subTotal,
         currency = input.currency
     )
+
+    fun mapCheckoutEntityToCheckout(input: List<CheckoutEntity>): List<Checkout> {
+        val checkouts = mutableListOf<Checkout>()
+        input.forEach { data ->
+            checkouts.add(
+                Checkout(
+                    documentNumber = data.documentNumber,
+                    documentCode = data.documentCode,
+                    productCode = data.productCode,
+                    productPrice = data.productPrice,
+                    productQuantity = data.productQuantity,
+                    unit = data.unit,
+                    subTotal = data.subTotal,
+                    currency = data.currency
+                )
+            )
+        }
+        return checkouts
+    }
 }

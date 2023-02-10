@@ -2,6 +2,7 @@ package com.app.ecommere.data.source.local.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.app.ecommere.data.source.local.entity.CheckoutEntity
 import com.app.ecommere.data.source.local.entity.ProductEntity
@@ -16,7 +17,7 @@ interface ECommerceDao {
     @Query("SELECT EXISTS (SELECT * FROM tb_register WHERE email LIKE :email AND password LIKE :password)")
     fun getUserByEmail(email: String, password: String): Flow<Boolean>
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAllProduct(productEntity: List<ProductEntity>)
 
     @Query("SELECT * FROM tb_product")
@@ -25,9 +26,12 @@ interface ECommerceDao {
     @Insert
     suspend fun insertCheckout(checkoutEntity: CheckoutEntity)
 
-    @Query("UPDATE tb_checkout SET product_quantity = product_quantity + :productQuantity OR sub_total = sub_total * product_quantity WHERE product_code LIKE :productCode")
+    @Query("UPDATE tb_checkout SET product_quantity = product_quantity + :productQuantity, sub_total = (product_quantity + 1) * product_price WHERE product_code LIKE :productCode")
     suspend fun updateProductByProductCode(productCode: String, productQuantity: Int)
 
     @Query("SELECT EXISTS (SELECT * FROM tb_checkout WHERE product_code LIKE :productCode)")
     fun getProductByProductCode(productCode: String): Flow<Boolean>
+
+    @Query("SELECT COUNT(*) FROM tb_checkout")
+    fun getCheckoutCount(): Flow<Int>
 }

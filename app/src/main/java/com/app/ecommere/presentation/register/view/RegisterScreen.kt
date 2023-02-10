@@ -46,6 +46,38 @@ fun RegisterScreen(
         mutableStateOf("")
     }
 
+    RegisterContent(
+        modifier = modifier,
+        name = name,
+        email = email,
+        password = password,
+        onNameChange = { name = it },
+        onEmailChange = { email = it },
+        onPassword = { password = it },
+        onBackClicked = onBackClicked,
+        onPhysicalBackClicked = onPhysicalBackClicked,
+        onTextClicked = onTextClicked,
+        onSignupClicked = {
+            val model = Register(name = name, email = email, password = password)
+            viewModel.insertUserRegister(model)
+        }
+    )
+}
+
+@Composable
+fun RegisterContent(
+    modifier: Modifier = Modifier,
+    name: String,
+    email: String,
+    password: String,
+    onNameChange: (String) -> Unit,
+    onEmailChange: (String) -> Unit,
+    onPassword: (String) -> Unit,
+    onBackClicked: () -> Unit,
+    onPhysicalBackClicked: () -> Unit,
+    onTextClicked: () -> Unit,
+    onSignupClicked: () -> Unit
+) {
     BackHandler {
         onPhysicalBackClicked()
     }
@@ -85,27 +117,24 @@ fun RegisterScreen(
                 modifier = Modifier.padding(top = 32.dp),
                 hint = stringResource(id = R.string.name),
                 value = name,
-                onValueChange = { name = it }
+                onValueChange = { onNameChange(it) }
             )
             FormInput(
                 modifier = Modifier.padding(top = 15.dp),
                 hint = stringResource(id = R.string.email_address),
                 value = email,
-                onValueChange = { email = it }
+                onValueChange = { onEmailChange(it) }
             )
             FormInput(
                 modifier = Modifier.padding(top = 15.dp),
                 hint = stringResource(id = R.string.password),
                 value = password,
-                onValueChange = { password = it }
+                onValueChange = { onPassword(it) }
             )
             ButtonRounded(
                 modifier = Modifier.padding(top = 32.dp),
                 text = stringResource(id = R.string.sign_up),
-                onClick = {
-                    val model = Register(name = name, email = email, password = password)
-                    viewModel.insertUserRegister(model)
-                }
+                onClick = onSignupClicked
             )
             Row(
                 modifier = Modifier

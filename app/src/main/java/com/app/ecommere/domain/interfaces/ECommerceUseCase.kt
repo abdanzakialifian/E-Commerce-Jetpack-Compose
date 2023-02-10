@@ -12,4 +12,5 @@ interface ECommerceUseCase {
     fun insertCheckout(checkout: Checkout)
     fun updateProductByProductCode(productCode: String, productQuantity: Int)
     fun getProductByProductCode(productCode: String): Flow<Boolean>
+    fun getCheckoutCount(): Flow<Int>
 }

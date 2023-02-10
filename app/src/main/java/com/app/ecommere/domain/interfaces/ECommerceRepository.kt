@@ -7,9 +7,10 @@ import kotlinx.coroutines.flow.Flow
 
 interface ECommerceRepository {
     fun insertUserRegister(register: Register)
-    fun getUserByEmail(email: String,  password: String): Flow<Boolean>
+    fun getUserByEmail(email: String, password: String): Flow<Boolean>
     fun getAllProduct(): Flow<List<Product>>
     fun insertCheckout(checkout: Checkout)
     fun updateProductByProductCode(productCode: String, productQuantity: Int)
     fun getProductByProductCode(productCode: String): Flow<Boolean>
+    fun getCheckoutCount(): Flow<Int>
 }

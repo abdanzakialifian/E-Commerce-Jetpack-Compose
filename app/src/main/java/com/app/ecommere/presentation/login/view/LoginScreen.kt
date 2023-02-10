@@ -22,7 +22,7 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.app.ecommere.R
@@ -36,31 +36,47 @@ import com.app.ecommere.utils.UiState
 @Composable
 fun LoginScreen(
     modifier: Modifier = Modifier,
-    viewModel: LoginViewModel = hiltViewModel(),
+    viewModel: LoginViewModel = viewModel(),
     onBackClicked: () -> Unit,
     onPhysicalBackClicked: () -> Unit,
     onTextClicked: () -> Unit
 ) {
+    var email by remember {
+        mutableStateOf("")
+    }
+
+    var password by remember {
+        mutableStateOf("")
+    }
+
     val context = LocalContext.current
 
-    when (val uiState = viewModel.getUserByEmail.collectAsStateWithLifecycle().value) {
-        is UiState.Loading -> {}
-        is UiState.Success -> {
-            if (uiState.data == true) {
-                Toast.makeText(context, "MASUK", Toast.LENGTH_SHORT).show()
-            } else {
-                Toast.makeText(context, "GAGAL", Toast.LENGTH_SHORT).show()
+    if (viewModel.isButtonClicked) {
+        when (val uiState = viewModel.getUserByEmail.collectAsStateWithLifecycle().value) {
+            is UiState.Loading -> {}
+            is UiState.Success -> {
+                if (uiState.data == true) {
+                    Toast.makeText(context, "MASUK", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(context, "GAGAL", Toast.LENGTH_SHORT).show()
+                }
+                viewModel.isButtonClicked = false
             }
+            is UiState.Error -> {}
         }
-        is UiState.Error -> {}
     }
 
     LoginScreenContent(
         modifier = modifier,
+        email = email,
+        password = password,
+        onEmailChange = { email = it },
+        onPasswordChange = { password = it },
         onBackClicked = onBackClicked,
         onPhysicalBackClicked = onPhysicalBackClicked,
         onTextClicked = onTextClicked,
-        onSubmitClicked = { email, password ->
+        onSubmitClicked = {
+            viewModel.isButtonClicked = true
             viewModel.getUserByEmail(email, password)
         }
     )
@@ -69,19 +85,15 @@ fun LoginScreen(
 @Composable
 fun LoginScreenContent(
     modifier: Modifier = Modifier,
+    email: String,
+    password: String,
+    onEmailChange: (String) -> Unit,
+    onPasswordChange: (String) -> Unit,
     onBackClicked: () -> Unit,
     onPhysicalBackClicked: () -> Unit,
     onTextClicked: () -> Unit,
-    onSubmitClicked: (String, String) -> Unit
+    onSubmitClicked: () -> Unit
 ) {
-
-    var email by remember {
-        mutableStateOf("")
-    }
-    var password by remember {
-        mutableStateOf("")
-    }
-
     BackHandler {
         onPhysicalBackClicked()
     }
@@ -115,15 +127,15 @@ fun LoginScreenContent(
             FormInput(modifier = Modifier.padding(top = 32.dp),
                 hint = stringResource(id = R.string.email_address),
                 value = email,
-                onValueChange = { email = it })
+                onValueChange = { onEmailChange(it) })
             FormInput(modifier = Modifier.padding(top = 15.dp),
                 hint = stringResource(id = R.string.password),
                 value = password,
-                onValueChange = { password = it })
+                onValueChange = { onPasswordChange(it) })
             ButtonRounded(
                 modifier = Modifier.padding(top = 32.dp),
                 text = stringResource(id = R.string.sign_in),
-                onClick = { onSubmitClicked(email, password) }
+                onClick = { onSubmitClicked() }
             )
             Row(
                 modifier = Modifier

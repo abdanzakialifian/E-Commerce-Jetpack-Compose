@@ -37,4 +37,6 @@ class ECommerceRepositoryImpl @Inject constructor(private val localDataSource: L
 
     override fun getProductByProductCode(productCode: String): Flow<Boolean> =
         localDataSource.getProductByProductCode(productCode)
+
+    override fun getCheckoutCount(): Flow<Int> = localDataSource.getCheckoutCount()
 }

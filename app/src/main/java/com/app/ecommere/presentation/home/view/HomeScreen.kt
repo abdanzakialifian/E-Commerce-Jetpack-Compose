@@ -2,18 +2,21 @@ package com.app.ecommere.presentation.home.view
 
 import android.widget.Toast
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -21,6 +24,8 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.app.ecommere.R
 import com.app.ecommere.domain.model.Checkout
@@ -33,6 +38,7 @@ import com.app.ecommere.utils.UiState
 import java.text.NumberFormat
 import java.util.*
 
+@OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
 fun HomeScreen(modifier: Modifier = Modifier, viewModel: HomeViewModel = viewModel()) {
 
@@ -40,37 +46,74 @@ fun HomeScreen(modifier: Modifier = Modifier, viewModel: HomeViewModel = viewMod
         mutableStateOf(listOf<Product>())
     }
 
-    var checkoutModel by remember {
+    var checkout by remember {
         mutableStateOf(Checkout())
     }
 
+    var search by remember {
+        mutableStateOf("")
+    }
+
+    var count by remember {
+        mutableStateOf(0)
+    }
+
+    viewModel.getCheckoutCount()
+    LaunchedEffect(key1 = Unit) {
+        viewModel.getAllProduct()
+    }
+
+    val getCheckoutCountState = viewModel.getCheckoutCount.collectAsStateWithLifecycle().value
+    val getAllProductState = viewModel.getAllProduct.collectAsStateWithLifecycle().value
+    val getProductByProductCodeState =
+        viewModel.getProductByProductCode.collectAsStateWithLifecycle().value
+
     val context = LocalContext.current
 
-    when (val state = viewModel.getAllProduct.collectAsState().value) {
+    when (getAllProductState) {
         is UiState.Loading -> {}
-        is UiState.Success -> products = state.data ?: emptyList()
+        is UiState.Success -> products = getAllProductState.data ?: emptyList()
         is UiState.Error -> {}
     }
 
-    when(val state = viewModel.getProductByProductCode.collectAsState().value) {
+    when (getCheckoutCountState) {
         is UiState.Loading -> {}
         is UiState.Success -> {
-            if (state.data == true) {
-                Toast.makeText(context, "FOUND", Toast.LENGTH_SHORT).show()
-            } else {
-                viewModel.insertCheckout(checkoutModel)
-                Toast.makeText(context, "NOT FOUND", Toast.LENGTH_SHORT).show()
-            }
+            count = getCheckoutCountState.data ?: 0
         }
         is UiState.Error -> {}
+    }
+
+    if (viewModel.isButtonClicked) {
+        viewModel.getProductByProductCode(checkout.productCode ?: "")
+        when (getProductByProductCodeState) {
+            is UiState.Loading -> {}
+            is UiState.Success -> {
+                if (getProductByProductCodeState.data == true) {
+                    viewModel.updateProductByProductCode(
+                        productCode = checkout.productCode ?: "",
+                        productQuantity = checkout.productQuantity ?: 0
+                    )
+                    Toast.makeText(context, "FOUND", Toast.LENGTH_SHORT).show()
+                } else {
+                    viewModel.insertCheckout(checkout)
+                    Toast.makeText(context, "NOT FOUND", Toast.LENGTH_SHORT).show()
+                }
+                viewModel.isButtonClicked = false
+            }
+            is UiState.Error -> {}
+        }
     }
 
     HomeContent(
         modifier = modifier,
         products,
-        onAddClicked = { productCode, checkout ->
-            viewModel.getProductByProductCode(productCode)
-            checkoutModel = checkout
+        search,
+        count,
+        onSearchChange = { search = it },
+        onAddClicked = {
+            viewModel.isButtonClicked = true
+            checkout = it
         }
     )
 }
@@ -79,13 +122,12 @@ fun HomeScreen(modifier: Modifier = Modifier, viewModel: HomeViewModel = viewMod
 fun HomeContent(
     modifier: Modifier = Modifier,
     products: List<Product>,
-    onAddClicked: (String, Checkout) -> Unit
+    search: String,
+    count: Int,
+    onSearchChange: (String) -> Unit,
+    onAddClicked: (Checkout) -> Unit
 ) {
     val context = LocalContext.current
-
-    var searchValue by remember {
-        mutableStateOf("")
-    }
 
     Column(
         modifier = modifier
@@ -107,26 +149,50 @@ fun HomeContent(
                     fontSize = 14.sp
                 )
             }
-            Box(
-                modifier = Modifier
-                    .border(
-                        width = 0.5.dp, shape = CircleShape, color = Color.Gray
+            Box() {
+                Box(
+                    modifier = Modifier.border(
+                        width = 0.5.dp,
+                        shape = CircleShape,
+                        color = Color.Gray
                     )
-                    .align(Alignment.CenterVertically)
-            ) {
-                Image(
-                    modifier = Modifier
-                        .padding(10.dp)
-                        .size(18.dp),
-                    painter = painterResource(id = R.drawable.ic_shopping_bag),
-                    contentDescription = "Shopping Bag",
-                )
+                ) {
+                    Image(
+                        modifier = Modifier
+                            .padding(10.dp)
+                            .size(18.dp)
+                            .align(Alignment.Center),
+                        painter = painterResource(id = R.drawable.ic_shopping_bag),
+                        contentDescription = "Shopping Bag",
+                    )
+
+                }
+
+                if (count != 0) {
+                    Box(
+                        modifier = Modifier
+                            .background(
+                                shape = CircleShape,
+                                color = colorResource(id = R.color.blue)
+                            )
+                            .align(
+                                Alignment.TopEnd
+                            )
+                    ) {
+                        Text(
+                            modifier = Modifier.padding(vertical = 3.dp, horizontal = 6.dp).align(Alignment.Center),
+                            text = count.toString(),
+                            color = Color.White,
+                            fontSize = 8.sp
+                        )
+                    }
+                }
             }
         }
         SearchBar(modifier = Modifier.padding(top = 20.dp),
             hint = stringResource(id = R.string.hint_search),
-            value = searchValue,
-            onValueChange = { searchValue = it })
+            value = search,
+            onValueChange = { onSearchChange(it) })
 
         LazyVerticalGrid(
             modifier = Modifier.padding(top = 20.dp),
@@ -154,7 +220,7 @@ fun HomeContent(
                     discount = formatRupiah(discount?.toDouble() ?: 0.0),
                     price = formatRupiah(price?.toDouble() ?: 0.0),
                     onItemClicked = {},
-                    onAddClicked = { 
+                    onAddClicked = {
                         val checkout = Checkout(
                             documentNumber = "00${product.productId}",
                             documentCode = "TRX",
@@ -165,7 +231,7 @@ fun HomeContent(
                             subTotal = product.productPrice,
                             currency = product.currency
                         )
-                        onAddClicked(product.productCode ?: "", checkout)
+                        onAddClicked(checkout)
                     }
                 )
             }
