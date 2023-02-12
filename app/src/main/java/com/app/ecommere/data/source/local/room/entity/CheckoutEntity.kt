@@ -1,20 +1,21 @@
-package com.app.ecommere.data.source.local.entity
+package com.app.ecommere.data.source.local.room.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import org.jetbrains.annotations.NotNull
 
 @Entity("tb_checkout")
 data class CheckoutEntity(
     @PrimaryKey
+    @ColumnInfo("product_code")
+    val productCode: String = "",
+
     @ColumnInfo("document_number")
-    val documentNumber: String = "",
+    val documentNumber: String? = null,
 
     @ColumnInfo("document_code")
     val documentCode: String? = null,
-
-    @ColumnInfo("product_code")
-    val productCode: String? = null,
 
     @ColumnInfo("product_price")
     val productPrice: Int? = null,
@@ -30,4 +31,10 @@ data class CheckoutEntity(
 
     @ColumnInfo("currency")
     val currency: String? = null,
+
+    @ColumnInfo("image_name")
+    val imageName: String? = null,
+
+    @ColumnInfo("product_name")
+    val productName: String? = null,
 )

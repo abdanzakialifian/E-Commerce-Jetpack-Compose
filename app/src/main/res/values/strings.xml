@@ -11,4 +11,10 @@
     <string name="content_sign_in">Already have an account?</string>
     <string name="asking_buying">What are you buying today?</string>
     <string name="hint_search">Search products</string>
+    <string name="sub_total">Sub total : </string>
+    <string name="checkout">Checkout</string>
+    <string name="total">Total : </string>
+    <string name="confirm">Confirm</string>
+    <string name="detail_product">Detail Product</string>
+    <string name="add_to_bag">Add to Bag</string>
 </resources>

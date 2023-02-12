@@ -1,6 +1,6 @@
 package com.app.ecommere.utils
 
-import com.app.ecommere.data.source.local.entity.ProductEntity
+import com.app.ecommere.data.source.local.room.entity.ProductEntity
 
 object DataEntity {
     fun populateData(): List<ProductEntity> {

@@ -4,13 +4,17 @@ import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Logout
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,16 +39,20 @@ import com.app.ecommere.presentation.component.SearchBar
 import com.app.ecommere.presentation.home.viewmodel.HomeViewModel
 import com.app.ecommere.presentation.theme.ECommerceTheme
 import com.app.ecommere.utils.UiState
-import java.text.NumberFormat
+import com.app.ecommere.utils.formatRupiah
 import java.util.*
 
 @OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
-fun HomeScreen(modifier: Modifier = Modifier, viewModel: HomeViewModel = viewModel()) {
-
-    var products by remember {
-        mutableStateOf(listOf<Product>())
-    }
+fun HomeScreen(
+    modifier: Modifier = Modifier,
+    viewModel: HomeViewModel = viewModel(),
+    email: String,
+    password: String,
+    onShoppingBagClicked: () -> Unit,
+    onItemClicked: (Int) -> Unit,
+    onLogoutClicked: () -> Unit
+) {
 
     var checkout by remember {
         mutableStateOf(Checkout())
@@ -58,46 +66,58 @@ fun HomeScreen(modifier: Modifier = Modifier, viewModel: HomeViewModel = viewMod
         mutableStateOf(0)
     }
 
-    viewModel.getCheckoutCount()
-    LaunchedEffect(key1 = Unit) {
-        viewModel.getAllProduct()
+    var products by remember {
+        mutableStateOf(listOf<Product>())
     }
 
-    val getCheckoutCountState = viewModel.getCheckoutCount.collectAsStateWithLifecycle().value
-    val getAllProductState = viewModel.getAllProduct.collectAsStateWithLifecycle().value
-    val getProductByProductCodeState =
-        viewModel.getProductByProductCode.collectAsStateWithLifecycle().value
+    var name by remember {
+        mutableStateOf("")
+    }
 
     val context = LocalContext.current
 
-    when (getAllProductState) {
+    viewModel.getCheckoutCount()
+
+    LaunchedEffect(key1 = Unit) {
+        viewModel.getAllProduct()
+        viewModel.setUserSession(true)
+        viewModel.getUserData()
+    }
+
+    when(val getUserDataState = viewModel.getUserData.collectAsStateWithLifecycle().value) {
         is UiState.Loading -> {}
-        is UiState.Success -> products = getAllProductState.data ?: emptyList()
+        is UiState.Success -> name = getUserDataState.data.name ?: ""
         is UiState.Error -> {}
     }
 
-    when (getCheckoutCountState) {
+
+    when (val getCheckoutCountState =
+        viewModel.getCheckoutCount.collectAsStateWithLifecycle().value) {
         is UiState.Loading -> {}
-        is UiState.Success -> {
-            count = getCheckoutCountState.data ?: 0
-        }
+        is UiState.Success -> count = getCheckoutCountState.data
+        is UiState.Error -> {}
+    }
+
+    when (val getAllProductState = viewModel.getAllProduct.collectAsStateWithLifecycle().value) {
+        is UiState.Loading -> {}
+        is UiState.Success -> products = getAllProductState.data
         is UiState.Error -> {}
     }
 
     if (viewModel.isButtonClicked) {
-        viewModel.getProductByProductCode(checkout.productCode ?: "")
-        when (getProductByProductCodeState) {
+        when (val getProductByProductCodeState =
+            viewModel.getProductByProductCode.collectAsStateWithLifecycle().value) {
             is UiState.Loading -> {}
             is UiState.Success -> {
-                if (getProductByProductCodeState.data == true) {
+                if (getProductByProductCodeState.data) {
                     viewModel.updateProductByProductCode(
                         productCode = checkout.productCode ?: "",
                         productQuantity = checkout.productQuantity ?: 0
                     )
-                    Toast.makeText(context, "FOUND", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "UPDATE", Toast.LENGTH_SHORT).show()
                 } else {
                     viewModel.insertCheckout(checkout)
-                    Toast.makeText(context, "NOT FOUND", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "INSERT", Toast.LENGTH_SHORT).show()
                 }
                 viewModel.isButtonClicked = false
             }
@@ -110,11 +130,27 @@ fun HomeScreen(modifier: Modifier = Modifier, viewModel: HomeViewModel = viewMod
         products,
         search,
         count,
+        name,
         onSearchChange = { search = it },
-        onAddClicked = {
+        onAddClicked = { product ->
+            checkout = Checkout(
+                documentNumber = "00${product.productId}",
+                documentCode = "TRX",
+                productCode = product.productCode,
+                productPrice = product.productPrice,
+                productQuantity = 1,
+                unit = product.unit,
+                subTotal = product.productPrice,
+                currency = product.currency,
+                imageName = product.imageName,
+                productName = product.productName
+            )
+            viewModel.getProductByProductCode(product.productCode ?: "")
             viewModel.isButtonClicked = true
-            checkout = it
-        }
+        },
+        onShoppingBagClicked = onShoppingBagClicked,
+        onItemClicked = onItemClicked,
+        onLogoutClicked = onLogoutClicked
     )
 }
 
@@ -124,8 +160,12 @@ fun HomeContent(
     products: List<Product>,
     search: String,
     count: Int,
+    name: String,
     onSearchChange: (String) -> Unit,
-    onAddClicked: (Checkout) -> Unit
+    onAddClicked: (Product) -> Unit,
+    onShoppingBagClicked: () -> Unit,
+    onItemClicked: (Int) -> Unit,
+    onLogoutClicked: () -> Unit
 ) {
     val context = LocalContext.current
 
@@ -137,7 +177,7 @@ fun HomeContent(
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             Column {
                 Text(
-                    text = "Hello Abdan Zaki Alifian,",
+                    text = "Hello $name,",
                     fontWeight = FontWeight.Bold,
                     fontSize = 20.sp,
                     color = Color.Black
@@ -149,43 +189,73 @@ fun HomeContent(
                     fontSize = 14.sp
                 )
             }
-            Box() {
+            Row {
+                Box {
+                    Box(
+                        modifier = Modifier
+                            .border(
+                                width = 0.5.dp, shape = CircleShape, color = Color.Gray
+                            )
+                            .clickable(
+                                onClick = onShoppingBagClicked,
+                                interactionSource = remember { MutableInteractionSource() },
+                                indication = rememberRipple(bounded = false)
+                            )
+                    ) {
+                        Image(
+                            modifier = Modifier
+                                .padding(10.dp)
+                                .size(18.dp)
+                                .align(Alignment.Center),
+                            painter = painterResource(id = R.drawable.ic_shopping_bag),
+                            contentDescription = "Shopping Bag",
+                        )
+
+                    }
+
+                    if (count != 0) {
+                        Box(
+                            modifier = Modifier
+                                .background(
+                                    shape = CircleShape,
+                                    color = colorResource(id = R.color.blue)
+                                )
+                                .align(
+                                    Alignment.TopEnd
+                                )
+                        ) {
+                            Text(
+                                modifier = Modifier
+                                    .padding(vertical = 3.dp, horizontal = 6.dp)
+                                    .align(Alignment.Center),
+                                text = count.toString(),
+                                color = Color.White,
+                                fontSize = 8.sp
+                            )
+                        }
+                    }
+                }
+                Spacer(modifier = Modifier.padding(start = 6.dp))
                 Box(
-                    modifier = Modifier.border(
-                        width = 0.5.dp,
-                        shape = CircleShape,
-                        color = Color.Gray
-                    )
+                    modifier = Modifier
+                        .border(
+                            width = 0.5.dp, shape = CircleShape, color = Color.Gray
+                        )
+                        .clickable(
+                            onClick = onLogoutClicked,
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = rememberRipple(bounded = false)
+                        )
                 ) {
                     Image(
                         modifier = Modifier
                             .padding(10.dp)
-                            .size(18.dp)
+                            .size(16.dp)
                             .align(Alignment.Center),
-                        painter = painterResource(id = R.drawable.ic_shopping_bag),
+                        imageVector = Icons.Filled.Logout,
                         contentDescription = "Shopping Bag",
                     )
 
-                }
-
-                if (count != 0) {
-                    Box(
-                        modifier = Modifier
-                            .background(
-                                shape = CircleShape,
-                                color = colorResource(id = R.color.blue)
-                            )
-                            .align(
-                                Alignment.TopEnd
-                            )
-                    ) {
-                        Text(
-                            modifier = Modifier.padding(vertical = 3.dp, horizontal = 6.dp).align(Alignment.Center),
-                            text = count.toString(),
-                            color = Color.White,
-                            fontSize = 8.sp
-                        )
-                    }
                 }
             }
         }
@@ -201,54 +271,37 @@ fun HomeContent(
             horizontalArrangement = Arrangement.spacedBy(10.dp),
             contentPadding = PaddingValues(bottom = 24.dp)
         ) {
-            items(products) { product ->
+            items(products, key = { it.productCode ?: "" }) { product ->
                 val drawableId = remember(product.imageName) {
                     context.resources.getIdentifier(
-                        product.imageName,
-                        "drawable",
-                        context.packageName
+                        product.imageName, "drawable", context.packageName
                     )
                 }
 
                 val discount = (product.productPrice?.div(100))?.times(product.discount ?: 0)
                 val price = product.productPrice?.minus(discount ?: 0)
 
-                ProductItem(
-                    image = painterResource(id = drawableId),
+                ProductItem(image = painterResource(id = drawableId),
                     title = product.productName ?: "",
                     description = product.description ?: "",
-                    discount = formatRupiah(discount?.toDouble() ?: 0.0),
-                    price = formatRupiah(price?.toDouble() ?: 0.0),
-                    onItemClicked = {},
-                    onAddClicked = {
-                        val checkout = Checkout(
-                            documentNumber = "00${product.productId}",
-                            documentCode = "TRX",
-                            productCode = product.productCode,
-                            productPrice = product.productPrice,
-                            productQuantity = 1,
-                            unit = product.unit,
-                            subTotal = product.productPrice,
-                            currency = product.currency
-                        )
-                        onAddClicked(checkout)
-                    }
-                )
+                    discount = discount?.toDouble()?.formatRupiah() ?: "",
+                    price = price?.toDouble()?.formatRupiah() ?: "",
+                    onItemClicked = { onItemClicked(product.productId ?: 0) },
+                    onAddClicked = { onAddClicked(product) })
             }
         }
     }
-}
-
-fun formatRupiah(price: Double): String {
-    val localeID = Locale("in", "ID")
-    val formatRupiah = NumberFormat.getCurrencyInstance(localeID)
-    return formatRupiah.format(price)
 }
 
 @Preview(showBackground = true, showSystemUi = true, device = Devices.PIXEL_4_XL)
 @Composable
 fun HomeScreenPreview() {
     ECommerceTheme {
-        HomeScreen()
+        HomeScreen(
+            email = "",
+            password = "",
+            onShoppingBagClicked = {},
+            onItemClicked = {},
+            onLogoutClicked = {})
     }
 }

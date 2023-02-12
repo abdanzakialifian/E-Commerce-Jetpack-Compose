@@ -39,4 +39,28 @@ class ECommerceRepositoryImpl @Inject constructor(private val localDataSource: L
         localDataSource.getProductByProductCode(productCode)
 
     override fun getCheckoutCount(): Flow<Int> = localDataSource.getCheckoutCount()
+    override fun getAllCheckout(): Flow<List<Checkout>> = localDataSource.getAllCheckout().map {
+        DataMapper.mapCheckoutEntityToCheckout(it)
+    }
+
+    override fun getProductById(productId: Int): Flow<Product> =
+        localDataSource.getProductById(productId).map {
+            DataMapper.mapProductEntityToProduct(it)
+        }
+
+    override fun saveUserSession(isLogin: Boolean) {
+        localDataSource.saveUserSession(isLogin)
+    }
+
+    override fun getUserSession(): Flow<Boolean> = localDataSource.getUserSession()
+    override fun getUserData(email: String): Flow<Register> =
+        localDataSource.getUserData(email).map {
+            DataMapper.mapRegisterEntityToRegister(it)
+        }
+
+    override fun getUserData(): Flow<String> = localDataSource.getUserData()
+
+    override fun saveUserData(email: String) {
+        localDataSource.saveUserData(email)
+    }
 }

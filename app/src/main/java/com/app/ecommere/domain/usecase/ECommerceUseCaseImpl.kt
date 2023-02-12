@@ -32,4 +32,22 @@ class ECommerceUseCaseImpl @Inject constructor(private val eCommerceRepository: 
         eCommerceRepository.getProductByProductCode(productCode)
 
     override fun getCheckoutCount(): Flow<Int> = eCommerceRepository.getCheckoutCount()
+
+    override fun getAllCheckout(): Flow<List<Checkout>> = eCommerceRepository.getAllCheckout()
+
+    override fun getProductById(productId: Int): Flow<Product> =
+        eCommerceRepository.getProductById(productId)
+
+    override fun saveUserSession(isLogin: Boolean) {
+        eCommerceRepository.saveUserSession(isLogin)
+    }
+
+    override fun getUserSession(): Flow<Boolean> = eCommerceRepository.getUserSession()
+    override fun getUserData(email: String): Flow<Register> = eCommerceRepository.getUserData(email)
+
+    override fun getUserData(): Flow<String> = eCommerceRepository.getUserData()
+
+    override fun saveUserData(email: String) {
+        eCommerceRepository.saveUserData(email)
+    }
 }

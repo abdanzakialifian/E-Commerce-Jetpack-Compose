@@ -1,8 +1,8 @@
 package com.app.ecommere.utils
 
-import com.app.ecommere.data.source.local.entity.CheckoutEntity
-import com.app.ecommere.data.source.local.entity.ProductEntity
-import com.app.ecommere.data.source.local.entity.RegisterEntity
+import com.app.ecommere.data.source.local.room.entity.CheckoutEntity
+import com.app.ecommere.data.source.local.room.entity.ProductEntity
+import com.app.ecommere.data.source.local.room.entity.RegisterEntity
 import com.app.ecommere.domain.model.Checkout
 import com.app.ecommere.domain.model.Product
 import com.app.ecommere.domain.model.Register
@@ -35,12 +35,14 @@ object DataMapper {
     fun mapCheckoutToCheckoutEntity(input: Checkout): CheckoutEntity = CheckoutEntity(
         documentNumber = input.documentNumber ?: "",
         documentCode = input.documentCode,
-        productCode = input.productCode,
+        productCode = input.productCode ?: "",
         productPrice = input.productPrice,
         productQuantity = input.productQuantity,
         unit = input.unit,
         subTotal = input.subTotal,
-        currency = input.currency
+        currency = input.currency,
+        imageName = input.imageName,
+        productName = input.productName
     )
 
     fun mapCheckoutEntityToCheckout(input: List<CheckoutEntity>): List<Checkout> {
@@ -55,10 +57,32 @@ object DataMapper {
                     productQuantity = data.productQuantity,
                     unit = data.unit,
                     subTotal = data.subTotal,
-                    currency = data.currency
+                    currency = data.currency,
+                    imageName = data.imageName,
+                    productName = data.productName
                 )
             )
         }
         return checkouts
     }
+
+    fun mapProductEntityToProduct(input: ProductEntity): Product = Product(
+        productId = input.productId,
+        productCode = input.productCode,
+        productName = input.productName,
+        productPrice = input.productPrice,
+        currency = input.currency,
+        discount = input.discount,
+        dimension = input.dimension,
+        unit = input.unit,
+        imageName = input.imageName,
+        description = input.description
+    )
+
+    fun mapRegisterEntityToRegister(input: RegisterEntity) = Register(
+        userId = input.userId,
+        name = input.name,
+        email = input.email,
+        password = input.password
+    )
 }

@@ -16,4 +16,8 @@ data class Checkout(
     val subTotal: Int? = null,
 
     val currency: String? = null,
+
+    val imageName: String? = null,
+
+    val productName: String? = null,
 )

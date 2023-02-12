@@ -1,4 +1,4 @@
-package com.app.ecommere.data.source.local.entity
+package com.app.ecommere.data.source.local.room.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity

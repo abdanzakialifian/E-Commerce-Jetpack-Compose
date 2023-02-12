@@ -1,6 +1,5 @@
 package com.app.ecommere.presentation.login.viewmodel
 
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -25,12 +24,21 @@ class LoginViewModel @Inject constructor(private val eCommerceUseCase: ECommerce
 
     fun getUserByEmail(email: String, password: String) {
         viewModelScope.launch {
-            if (isButtonClicked) {
-                _getUserByEmail.value = UiState.Success(null)
-                eCommerceUseCase.getUserByEmail(email, password).collect { isAlreadyAccount ->
-                    _getUserByEmail.value = UiState.Success(isAlreadyAccount)
-                }
+            eCommerceUseCase.getUserByEmail(email, password).collect { isAlreadyAccount ->
+                _getUserByEmail.value = UiState.Success(isAlreadyAccount)
             }
+        }
+    }
+
+    fun setUserSession(isLogin: Boolean) {
+        viewModelScope.launch {
+            eCommerceUseCase.saveUserSession(isLogin)
+        }
+    }
+
+    fun saveUserData(email: String) {
+        viewModelScope.launch {
+            eCommerceUseCase.saveUserData(email)
         }
     }
 }

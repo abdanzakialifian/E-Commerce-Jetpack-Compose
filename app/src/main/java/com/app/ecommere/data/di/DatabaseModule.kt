@@ -4,8 +4,8 @@ import android.content.Context
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.app.ecommere.data.source.local.dao.ECommerceDao
-import com.app.ecommere.data.source.local.database.ECommerceDatabase
+import com.app.ecommere.data.source.local.room.dao.ECommerceDao
+import com.app.ecommere.data.source.local.room.database.ECommerceDatabase
 import com.app.ecommere.utils.DataEntity
 import dagger.Module
 import dagger.Provides
@@ -32,13 +32,6 @@ class DatabaseModule {
             .addCallback(object : RoomDatabase.Callback() {
                 override fun onCreate(db: SupportSQLiteDatabase) {
                     super.onCreate(db)
-                    CoroutineScope(SupervisorJob()).launch(Dispatchers.IO) {
-                        provider.get().insertAllProduct(DataEntity.populateData())
-                    }
-                }
-
-                override fun onOpen(db: SupportSQLiteDatabase) {
-                    super.onOpen(db)
                     CoroutineScope(SupervisorJob()).launch(Dispatchers.IO) {
                         provider.get().insertAllProduct(DataEntity.populateData())
                     }

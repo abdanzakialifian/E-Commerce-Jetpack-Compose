@@ -4,6 +4,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
@@ -78,6 +79,8 @@ fun RegisterContent(
     onTextClicked: () -> Unit,
     onSignupClicked: () -> Unit
 ) {
+    val interactionSource = remember { MutableInteractionSource() }
+
     BackHandler {
         onPhysicalBackClicked()
     }
@@ -129,6 +132,7 @@ fun RegisterContent(
                 modifier = Modifier.padding(top = 15.dp),
                 hint = stringResource(id = R.string.password),
                 value = password,
+                isToggleActive = true,
                 onValueChange = { onPassword(it) }
             )
             ButtonRounded(
@@ -148,9 +152,11 @@ fun RegisterContent(
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
-                    modifier = Modifier.clickable {
-                        onTextClicked()
-                    },
+                    modifier = Modifier.clickable(
+                        onClick = onTextClicked,
+                        interactionSource = interactionSource,
+                        indication = null
+                    ),
                     text = stringResource(id = R.string.sign_in),
                     color = colorResource(id = R.color.blue),
                     fontSize = 12.sp

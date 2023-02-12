@@ -1,5 +1,6 @@
 package com.app.ecommere.domain.interfaces
 
+import com.app.ecommere.data.source.local.room.entity.RegisterEntity
 import com.app.ecommere.domain.model.Checkout
 import com.app.ecommere.domain.model.Product
 import com.app.ecommere.domain.model.Register
@@ -13,4 +14,11 @@ interface ECommerceUseCase {
     fun updateProductByProductCode(productCode: String, productQuantity: Int)
     fun getProductByProductCode(productCode: String): Flow<Boolean>
     fun getCheckoutCount(): Flow<Int>
+    fun getAllCheckout(): Flow<List<Checkout>>
+    fun getProductById(productId: Int): Flow<Product>
+    fun saveUserSession(isLogin: Boolean)
+    fun getUserSession(): Flow<Boolean>
+    fun getUserData(email: String): Flow<Register>
+    fun saveUserData(email: String)
+    fun getUserData(): Flow<String>
 }
