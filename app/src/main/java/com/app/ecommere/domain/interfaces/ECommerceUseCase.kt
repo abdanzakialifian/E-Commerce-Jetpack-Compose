@@ -1,6 +1,5 @@
 package com.app.ecommere.domain.interfaces
 
-import com.app.ecommere.data.source.local.room.entity.RegisterEntity
 import com.app.ecommere.domain.model.Checkout
 import com.app.ecommere.domain.model.Product
 import com.app.ecommere.domain.model.Register

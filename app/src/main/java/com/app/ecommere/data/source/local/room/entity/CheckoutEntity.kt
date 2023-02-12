@@ -3,7 +3,6 @@ package com.app.ecommere.data.source.local.room.entity
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import org.jetbrains.annotations.NotNull
 
 @Entity("tb_checkout")
 data class CheckoutEntity(
