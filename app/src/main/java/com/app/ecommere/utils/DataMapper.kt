@@ -3,9 +3,11 @@ package com.app.ecommere.utils
 import com.app.ecommere.data.source.local.room.entity.CheckoutEntity
 import com.app.ecommere.data.source.local.room.entity.ProductEntity
 import com.app.ecommere.data.source.local.room.entity.RegisterEntity
+import com.app.ecommere.data.source.local.room.entity.TransactionEntity
 import com.app.ecommere.domain.model.Checkout
 import com.app.ecommere.domain.model.Product
 import com.app.ecommere.domain.model.Register
+import com.app.ecommere.domain.model.Transaction
 
 object DataMapper {
     fun mapRegisterToRegisterEntity(input: Register): RegisterEntity =
@@ -85,4 +87,13 @@ object DataMapper {
         email = input.email,
         password = input.password
     )
+
+    fun mapTransactionToTransactionEntity(input: Transaction): TransactionEntity =
+        TransactionEntity(
+            documentNumber = input.documentNumber,
+            documentCode = input.documentCode,
+            user = input.user,
+            total = input.total,
+            date = input.date
+        )
 }

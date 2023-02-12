@@ -36,6 +36,13 @@ class DatabaseModule {
                         provider.get().insertAllProduct(DataEntity.populateData())
                     }
                 }
+
+                override fun onOpen(db: SupportSQLiteDatabase) {
+                    super.onOpen(db)
+                    CoroutineScope(SupervisorJob()).launch(Dispatchers.IO) {
+                        provider.get().insertAllProduct(DataEntity.populateData())
+                    }
+                }
             })
             .fallbackToDestructiveMigration()
             .build()

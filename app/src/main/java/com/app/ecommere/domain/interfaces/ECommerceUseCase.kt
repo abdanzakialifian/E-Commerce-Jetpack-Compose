@@ -4,6 +4,7 @@ import com.app.ecommere.data.source.local.room.entity.RegisterEntity
 import com.app.ecommere.domain.model.Checkout
 import com.app.ecommere.domain.model.Product
 import com.app.ecommere.domain.model.Register
+import com.app.ecommere.domain.model.Transaction
 import kotlinx.coroutines.flow.Flow
 
 interface ECommerceUseCase {
@@ -21,4 +22,6 @@ interface ECommerceUseCase {
     fun getUserData(email: String): Flow<Register>
     fun saveUserData(email: String)
     fun getUserData(): Flow<String>
+    fun insertTransaction(transaction: Transaction)
+    fun deleteCheckout()
 }

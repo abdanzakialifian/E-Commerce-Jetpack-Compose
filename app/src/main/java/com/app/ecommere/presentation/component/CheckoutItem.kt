@@ -20,6 +20,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.app.ecommere.R
+import com.app.ecommere.presentation.theme.ECommerceTheme
 
 @Composable
 fun CheckoutItem(
@@ -90,11 +91,13 @@ fun CheckoutItem(
 @Preview(showBackground = true)
 @Composable
 fun CheckoutItemPreview() {
-    CheckoutItem(
-        painter = painterResource(id = R.drawable.mie_sedap),
-        productName = "Mie Sedap",
-        productQuantity = 4,
-        productUnit = "PCS",
-        subTotal = "Rp12.000"
-    )
+    ECommerceTheme {
+        CheckoutItem(
+            painter = painterResource(id = R.drawable.mie_sedap),
+            productName = "Mie Sedap",
+            productQuantity = 4,
+            productUnit = "PCS",
+            subTotal = "Rp12.000"
+        )
+    }
 }

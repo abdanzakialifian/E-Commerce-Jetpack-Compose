@@ -11,7 +11,6 @@ import com.app.ecommere.domain.model.Product
 import com.app.ecommere.domain.model.Register
 import com.app.ecommere.utils.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -37,6 +36,8 @@ class HomeViewModel @Inject constructor(private val eCommerceUseCase: ECommerceU
     val getUserData = _getUserData.asStateFlow()
 
     var isButtonClicked by mutableStateOf(false)
+
+    var isLogoutClicked by mutableStateOf(false)
 
     fun getAllProduct() {
         viewModelScope.launch {
@@ -82,13 +83,13 @@ class HomeViewModel @Inject constructor(private val eCommerceUseCase: ECommerceU
 
     fun getUserData() {
         viewModelScope.launch {
-            eCommerceUseCase.getUserData().collect {email ->
+            eCommerceUseCase.getUserData().collect { email ->
                 getUserData(email)
             }
         }
     }
 
-    fun getUserData(email: String) {
+    private fun getUserData(email: String) {
         viewModelScope.launch {
             eCommerceUseCase.getUserData(email).collect { data ->
                 _getUserData.value = UiState.Success(data)

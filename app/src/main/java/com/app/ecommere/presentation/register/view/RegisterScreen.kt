@@ -25,6 +25,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.app.ecommere.R
 import com.app.ecommere.domain.model.Register
 import com.app.ecommere.presentation.component.ButtonRounded
+import com.app.ecommere.presentation.component.CustomAlertDialog
 import com.app.ecommere.presentation.component.FormInput
 import com.app.ecommere.presentation.register.viewmodel.RegisterViewModel
 import com.app.ecommere.presentation.theme.ECommerceTheme
@@ -47,6 +48,23 @@ fun RegisterScreen(
         mutableStateOf("")
     }
 
+    if (viewModel.isButtonClicked) {
+        val model = Register(name = name, email = email, password = password)
+        viewModel.insertUserRegister(model)
+        CustomAlertDialog(
+            title = stringResource(id = R.string.success),
+            subTitle = stringResource(id = R.string.sub_title_registration),
+            isShowNegativeButton = true,
+            onConfirmClicked = {
+                onTextClicked()
+                viewModel.isButtonClicked = false
+            },
+            onDismissClicked = {
+                viewModel.isButtonClicked = false
+            },
+        )
+    }
+
     RegisterContent(
         modifier = modifier,
         name = name,
@@ -59,8 +77,7 @@ fun RegisterScreen(
         onPhysicalBackClicked = onPhysicalBackClicked,
         onTextClicked = onTextClicked,
         onSignupClicked = {
-            val model = Register(name = name, email = email, password = password)
-            viewModel.insertUserRegister(model)
+            viewModel.isButtonClicked = true
         }
     )
 }
@@ -138,7 +155,8 @@ fun RegisterContent(
             ButtonRounded(
                 modifier = Modifier.padding(top = 32.dp),
                 text = stringResource(id = R.string.sign_up),
-                onClick = onSignupClicked
+                onClick = onSignupClicked,
+                enabled = name.isNotEmpty() && email.isNotEmpty() && password.isNotEmpty()
             )
             Row(
                 modifier = Modifier

@@ -33,7 +33,7 @@ import com.app.ecommere.presentation.login.viewmodel.LoginViewModel
 import com.app.ecommere.presentation.navigation.Screen
 import com.app.ecommere.presentation.register.view.RegisterScreen
 import com.app.ecommere.presentation.register.viewmodel.RegisterViewModel
-import com.app.ecommere.presentation.splash.SplashScreen
+import com.app.ecommere.presentation.splash.view.SplashScreen
 import com.app.ecommere.presentation.theme.ECommerceTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -97,14 +97,7 @@ fun ECommerceApp(vm: ECommerceViewModel = viewModel()) {
                 onTextClicked = {
                     navController.navigate(Screen.RegisterScreen.route)
                 },
-                onNavigateToHomeScreen = { email, password ->
-                    navController.navigate(
-                        Screen.HomeScreen.createRoute(
-                            email,
-                            password
-                        )
-                    )
-                }
+                onNavigateToHomeScreen = { navController.navigate(Screen.HomeScreen.route) }
             )
         }
         composable(route = Screen.RegisterScreen.route) {
@@ -118,20 +111,10 @@ fun ECommerceApp(vm: ECommerceViewModel = viewModel()) {
                 }
             )
         }
-        composable(
-            route = Screen.HomeScreen.route,
-            arguments = listOf(
-                navArgument("email") { type = NavType.StringType },
-                navArgument("password") { type = NavType.StringType }
-            )
-        ) {
-            val email = it.arguments?.getString("email")
-            val password = it.arguments?.getString("password")
+        composable(route = Screen.HomeScreen.route) {
             val viewModel = hiltViewModel<HomeViewModel>()
             HomeScreen(
                 viewModel = viewModel,
-                email = email ?: "",
-                password = password ?: "",
                 onShoppingBagClicked = {
                     navController.navigate(Screen.CheckoutScreen.route)
                 },
@@ -147,7 +130,16 @@ fun ECommerceApp(vm: ECommerceViewModel = viewModel()) {
         }
         composable(route = Screen.CheckoutScreen.route) {
             val viewModel = hiltViewModel<CheckoutViewModel>()
-            CheckoutScreen(viewModel = viewModel, onBackClicked = { navController.navigateUp() })
+            CheckoutScreen(
+                viewModel = viewModel,
+                onBackClicked = { navController.navigateUp() },
+                onNavigateToHome = {
+                    navController.navigate(Screen.HomeScreen.route) {
+                        popUpTo(Screen.HomeScreen.route) {
+                            inclusive = true
+                        }
+                    }
+                })
         }
         composable(
             route = Screen.DetailScreen.route,

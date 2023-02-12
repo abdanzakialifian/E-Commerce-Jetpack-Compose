@@ -1,6 +1,5 @@
 package com.app.ecommere.presentation.home.view
 
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -34,6 +33,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.app.ecommere.R
 import com.app.ecommere.domain.model.Checkout
 import com.app.ecommere.domain.model.Product
+import com.app.ecommere.presentation.component.CustomAlertDialog
 import com.app.ecommere.presentation.component.ProductItem
 import com.app.ecommere.presentation.component.SearchBar
 import com.app.ecommere.presentation.home.viewmodel.HomeViewModel
@@ -47,12 +47,17 @@ import java.util.*
 fun HomeScreen(
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = viewModel(),
-    email: String,
-    password: String,
     onShoppingBagClicked: () -> Unit,
     onItemClicked: (Int) -> Unit,
     onLogoutClicked: () -> Unit
 ) {
+    LaunchedEffect(key1 = Unit) {
+        viewModel.getAllProduct()
+        viewModel.setUserSession(true)
+        viewModel.getUserData()
+    }
+
+    viewModel.getCheckoutCount()
 
     var checkout by remember {
         mutableStateOf(Checkout())
@@ -74,22 +79,11 @@ fun HomeScreen(
         mutableStateOf("")
     }
 
-    val context = LocalContext.current
-
-    viewModel.getCheckoutCount()
-
-    LaunchedEffect(key1 = Unit) {
-        viewModel.getAllProduct()
-        viewModel.setUserSession(true)
-        viewModel.getUserData()
-    }
-
-    when(val getUserDataState = viewModel.getUserData.collectAsStateWithLifecycle().value) {
+    when (val getUserDataState = viewModel.getUserData.collectAsStateWithLifecycle().value) {
         is UiState.Loading -> {}
         is UiState.Success -> name = getUserDataState.data.name ?: ""
         is UiState.Error -> {}
     }
-
 
     when (val getCheckoutCountState =
         viewModel.getCheckoutCount.collectAsStateWithLifecycle().value) {
@@ -114,15 +108,28 @@ fun HomeScreen(
                         productCode = checkout.productCode ?: "",
                         productQuantity = checkout.productQuantity ?: 0
                     )
-                    Toast.makeText(context, "UPDATE", Toast.LENGTH_SHORT).show()
+                    viewModel.isButtonClicked = false
                 } else {
                     viewModel.insertCheckout(checkout)
-                    Toast.makeText(context, "INSERT", Toast.LENGTH_SHORT).show()
+                    viewModel.isButtonClicked = false
                 }
-                viewModel.isButtonClicked = false
             }
             is UiState.Error -> {}
         }
+    }
+
+    if (viewModel.isLogoutClicked) {
+        CustomAlertDialog(title = stringResource(id = R.string.logout),
+            subTitle = stringResource(
+                id = R.string.sub_title_logout
+            ),
+            isShowNegativeButton = true,
+            onConfirmClicked = {
+                onLogoutClicked()
+                viewModel.isLogoutClicked = false
+            },
+            onDismissClicked = { viewModel.isLogoutClicked = false })
+
     }
 
     HomeContent(
@@ -150,7 +157,7 @@ fun HomeScreen(
         },
         onShoppingBagClicked = onShoppingBagClicked,
         onItemClicked = onItemClicked,
-        onLogoutClicked = onLogoutClicked
+        onLogoutClicked = { viewModel.isLogoutClicked = true }
     )
 }
 
@@ -298,8 +305,6 @@ fun HomeContent(
 fun HomeScreenPreview() {
     ECommerceTheme {
         HomeScreen(
-            email = "",
-            password = "",
             onShoppingBagClicked = {},
             onItemClicked = {},
             onLogoutClicked = {})

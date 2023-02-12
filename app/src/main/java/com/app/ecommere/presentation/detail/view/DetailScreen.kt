@@ -1,7 +1,5 @@
 package com.app.ecommere.presentation.detail.view
 
-import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -47,6 +45,12 @@ fun DetailScreen(
     onBackClicked: () -> Unit,
     onShoppingBagClicked: () -> Unit
 ) {
+
+    LaunchedEffect(key1 = Unit) {
+        viewModel.getProductById(productId)
+        viewModel.getCheckoutCount()
+    }
+
     var count by remember {
         mutableStateOf(0)
     }
@@ -85,11 +89,6 @@ fun DetailScreen(
 
     var checkout by remember {
         mutableStateOf(Checkout())
-    }
-
-    LaunchedEffect(key1 = Unit) {
-        viewModel.getProductById(productId)
-        viewModel.getCheckoutCount()
     }
 
     when (val getProductByIdState = viewModel.getProductById.collectAsState().value) {
@@ -299,7 +298,11 @@ fun DetailContent(
             )
         }
 
-        ButtonRounded(text = stringResource(id = R.string.add_to_bag), onClick = onButtonClicked)
+        ButtonRounded(
+            text = stringResource(id = R.string.add_to_bag),
+            enabled = true,
+            onClick = onButtonClicked
+        )
     }
 }
 

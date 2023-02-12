@@ -5,6 +5,7 @@ import com.app.ecommere.domain.interfaces.ECommerceUseCase
 import com.app.ecommere.domain.model.Checkout
 import com.app.ecommere.domain.model.Product
 import com.app.ecommere.domain.model.Register
+import com.app.ecommere.domain.model.Transaction
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -49,5 +50,13 @@ class ECommerceUseCaseImpl @Inject constructor(private val eCommerceRepository: 
 
     override fun saveUserData(email: String) {
         eCommerceRepository.saveUserData(email)
+    }
+
+    override fun insertTransaction(transaction: Transaction) {
+        eCommerceRepository.insertTransaction(transaction)
+    }
+
+    override fun deleteCheckout() {
+        eCommerceRepository.deleteCheckout()
     }
 }

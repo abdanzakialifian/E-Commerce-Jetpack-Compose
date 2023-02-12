@@ -1,5 +1,6 @@
 package com.app.ecommere.presentation.checkout.view
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -26,19 +27,29 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.app.ecommere.R
 import com.app.ecommere.domain.model.Checkout
+import com.app.ecommere.domain.model.Transaction
 import com.app.ecommere.presentation.checkout.viewmodel.CheckoutViewModel
 import com.app.ecommere.presentation.component.ButtonRounded
 import com.app.ecommere.presentation.component.CheckoutItem
+import com.app.ecommere.presentation.component.CustomAlertDialog
 import com.app.ecommere.utils.UiState
 import com.app.ecommere.utils.formatRupiah
+import java.text.SimpleDateFormat
+import java.util.*
 
 @OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
 fun CheckoutScreen(
     modifier: Modifier = Modifier,
     viewModel: CheckoutViewModel = viewModel(),
-    onBackClicked: () -> Unit
+    onBackClicked: () -> Unit,
+    onNavigateToHome: () -> Unit,
 ) {
+
+    LaunchedEffect(key1 = Unit) {
+        viewModel.getAllCheckout()
+        viewModel.getUserData()
+    }
 
     var checkouts by remember {
         mutableStateOf(listOf<Checkout>())
@@ -48,9 +59,7 @@ fun CheckoutScreen(
         mutableStateOf(0)
     }
 
-    LaunchedEffect(key1 = Unit) {
-        viewModel.getAllCheckout()
-    }
+    val email = viewModel.email.collectAsStateWithLifecycle().value
 
     when (val getAllCheckoutState = viewModel.getAllCheckout.collectAsStateWithLifecycle().value) {
         is UiState.Loading -> {}
@@ -64,7 +73,40 @@ fun CheckoutScreen(
         }
         is UiState.Error -> {}
     }
-    CheckoutContent(modifier = modifier, checkouts, totalPrice, onBackClicked)
+
+    if (viewModel.isButtonClicked) {
+        val dateFormat = SimpleDateFormat("dd-MM-yyyy hh:mm:ss", Locale.getDefault())
+        val currentDate = dateFormat.format(Date())
+
+        val transaction = Transaction(
+            documentCode = "TRX",
+            user = email,
+            total = totalPrice,
+            date = currentDate
+        )
+        viewModel.insertTransaction(transaction)
+        CustomAlertDialog(
+            title = stringResource(id = R.string.success),
+            subTitle = stringResource(id = R.string.sub_title_checkout),
+            onConfirmClicked = {
+                viewModel.deleteCheckout()
+                onNavigateToHome()
+                viewModel.isButtonClicked = false
+            },
+            onDismissClicked = {})
+    }
+
+    CheckoutContent(
+        modifier = modifier,
+        checkouts,
+        totalPrice,
+        onBackClicked,
+        onButtonConfirmClicked = {
+            if (checkouts.isNotEmpty()) {
+                viewModel.isButtonClicked = true
+            }
+        },
+    )
 }
 
 @Composable
@@ -72,7 +114,8 @@ fun CheckoutContent(
     modifier: Modifier = Modifier,
     checkouts: List<Checkout>,
     totalPrice: Int,
-    onBackClicked: () -> Unit
+    onBackClicked: () -> Unit,
+    onButtonConfirmClicked: () -> Unit,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
 
@@ -140,7 +183,9 @@ fun CheckoutContent(
                     ButtonRounded(
                         modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
                         text = stringResource(id = R.string.confirm),
-                        onClick = {})
+                        enabled = true,
+                        onClick = onButtonConfirmClicked
+                    )
                 }
             }
         }
@@ -150,5 +195,5 @@ fun CheckoutContent(
 @Preview(showBackground = true, showSystemUi = true, device = Devices.PIXEL_4_XL)
 @Composable
 fun CheckoutScreenPreview() {
-    CheckoutScreen(onBackClicked = {})
+    CheckoutScreen(onBackClicked = {}, onNavigateToHome = {})
 }

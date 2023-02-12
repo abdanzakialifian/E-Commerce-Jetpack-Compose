@@ -5,6 +5,7 @@ import com.app.ecommere.data.source.local.room.dao.ECommerceDao
 import com.app.ecommere.data.source.local.room.entity.CheckoutEntity
 import com.app.ecommere.data.source.local.room.entity.ProductEntity
 import com.app.ecommere.data.source.local.room.entity.RegisterEntity
+import com.app.ecommere.data.source.local.room.entity.TransactionEntity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -68,4 +69,15 @@ class LocalDataSource @Inject constructor(
     }
 
     fun getUserData(): Flow<String> = eCommerceDataStore.getUserData()
+
+    fun insertTransaction(transactionEntity: TransactionEntity) {
+        CoroutineScope(Dispatchers.IO).launch {
+            eCommerceDao.insertTransaction(transactionEntity)
+        }
+    }
+    fun deleteCheckout() {
+        CoroutineScope(Dispatchers.IO).launch {
+            eCommerceDao.deleteCheckout()
+        }
+    }
 }

@@ -1,6 +1,5 @@
 package com.app.ecommere.presentation.login.view
 
-import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -14,7 +13,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -28,6 +26,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.app.ecommere.R
 import com.app.ecommere.presentation.component.ButtonRounded
+import com.app.ecommere.presentation.component.CustomAlertDialog
 import com.app.ecommere.presentation.component.FormInput
 import com.app.ecommere.presentation.login.viewmodel.LoginViewModel
 import com.app.ecommere.presentation.theme.ECommerceTheme
@@ -41,7 +40,7 @@ fun LoginScreen(
     onBackClicked: () -> Unit,
     onPhysicalBackClicked: () -> Unit,
     onTextClicked: () -> Unit,
-    onNavigateToHomeScreen: (String, String) -> Unit
+    onNavigateToHomeScreen: () -> Unit
 ) {
     var email by remember {
         mutableStateOf("")
@@ -55,22 +54,27 @@ fun LoginScreen(
         viewModel.setUserSession(false)
     }
 
-    val context = LocalContext.current
-
     if (viewModel.isButtonClicked) {
         when (val dataState = viewModel.getUserByEmail.collectAsStateWithLifecycle().value) {
             is UiState.Loading -> {}
             is UiState.Success -> {
                 if (dataState.data) {
-                    onNavigateToHomeScreen(email, password)
                     viewModel.saveUserData(email)
+                    onNavigateToHomeScreen()
+                    viewModel.isButtonClicked = false
                 } else {
-                    Toast.makeText(context, "GAGAL", Toast.LENGTH_SHORT).show()
+                    CustomAlertDialog(
+                        title = stringResource(id = R.string.failed),
+                        subTitle = stringResource(
+                            id = R.string.sub_title_login
+                        ),
+                        onConfirmClicked = { viewModel.isButtonClicked = false },
+                        onDismissClicked = {},
+                    )
                 }
             }
             is UiState.Error -> {}
         }
-        viewModel.isButtonClicked = false
     }
 
     LoginContent(
@@ -145,7 +149,8 @@ fun LoginContent(
             ButtonRounded(
                 modifier = Modifier.padding(top = 32.dp),
                 text = stringResource(id = R.string.sign_in),
-                onClick = { onSubmitClicked() }
+                onClick = { onSubmitClicked() },
+                enabled = email.isNotEmpty() && password.isNotEmpty()
             )
             Row(
                 modifier = Modifier
@@ -181,6 +186,6 @@ fun LoginScreenPreview() {
             onBackClicked = {},
             onPhysicalBackClicked = {},
             onTextClicked = {},
-            onNavigateToHomeScreen = { _, _ -> })
+            onNavigateToHomeScreen = { })
     }
 }

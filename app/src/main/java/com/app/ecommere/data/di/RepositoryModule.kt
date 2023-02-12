@@ -1,6 +1,6 @@
 package com.app.ecommere.data.di
 
-import com.app.ecommere.data.repository.ECommerceRepositoryImpl
+import com.app.ecommere.data.source.repository.ECommerceRepositoryImpl
 import com.app.ecommere.domain.interfaces.ECommerceRepository
 import dagger.Binds
 import dagger.Module

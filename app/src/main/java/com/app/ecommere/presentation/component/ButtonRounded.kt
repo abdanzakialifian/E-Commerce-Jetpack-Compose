@@ -16,9 +16,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.app.ecommere.R
+import com.app.ecommere.presentation.theme.ECommerceTheme
 
 @Composable
-fun ButtonRounded(modifier: Modifier = Modifier, text: String, onClick: () -> Unit) {
+fun ButtonRounded(
+    modifier: Modifier = Modifier,
+    text: String,
+    onClick: () -> Unit,
+    enabled: Boolean = false
+) {
     Button(
         modifier = modifier.fillMaxWidth(),
         colors = ButtonDefaults.buttonColors(
@@ -26,7 +32,8 @@ fun ButtonRounded(modifier: Modifier = Modifier, text: String, onClick: () -> Un
             contentColor = Color.White
         ),
         shape = RoundedCornerShape(12.dp),
-        onClick = onClick
+        onClick = onClick,
+        enabled = enabled
     ) {
         Text(
             modifier = Modifier.padding(8.dp),
@@ -40,5 +47,7 @@ fun ButtonRounded(modifier: Modifier = Modifier, text: String, onClick: () -> Un
 @Preview(showBackground = true)
 @Composable
 fun RoundedButtonPreview() {
-    ButtonRounded(text = stringResource(id = R.string.sign_in), onClick = {})
+    ECommerceTheme {
+        ButtonRounded(text = stringResource(id = R.string.sign_in), onClick = {})
+    }
 }

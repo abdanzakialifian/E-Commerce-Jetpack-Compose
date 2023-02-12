@@ -17,4 +17,13 @@
     <string name="confirm">Confirm</string>
     <string name="detail_product">Detail Product</string>
     <string name="add_to_bag">Add to Bag</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="success">Success!</string>
+    <string name="sub_title_registration">Congratulations, you have successfully registered as a user.</string>
+    <string name="failed">Failed!</string>
+    <string name="sub_title_login">Make sure the email and password you entered are correct.</string>
+    <string name="sub_title_checkout">Payment successful. The goods will be delivered soon.</string>
+    <string name="logout">Logout</string>
+    <string name="sub_title_logout">Are you sure you want to logout?</string>
 </resources>

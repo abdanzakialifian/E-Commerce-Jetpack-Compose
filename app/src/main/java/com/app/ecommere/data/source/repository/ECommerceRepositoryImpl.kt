@@ -1,10 +1,11 @@
-package com.app.ecommere.data.repository
+package com.app.ecommere.data.source.repository
 
 import com.app.ecommere.data.source.local.LocalDataSource
 import com.app.ecommere.domain.interfaces.ECommerceRepository
 import com.app.ecommere.domain.model.Checkout
 import com.app.ecommere.domain.model.Product
 import com.app.ecommere.domain.model.Register
+import com.app.ecommere.domain.model.Transaction
 import com.app.ecommere.utils.DataMapper
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -62,5 +63,14 @@ class ECommerceRepositoryImpl @Inject constructor(private val localDataSource: L
 
     override fun saveUserData(email: String) {
         localDataSource.saveUserData(email)
+    }
+
+    override fun insertTransaction(transaction: Transaction) {
+        val transactionEntity = DataMapper.mapTransactionToTransactionEntity(transaction)
+        localDataSource.insertTransaction(transactionEntity)
+    }
+
+    override fun deleteCheckout() {
+        localDataSource.deleteCheckout()
     }
 }

@@ -1,4 +1,4 @@
-package com.app.ecommere.presentation.splash
+package com.app.ecommere.presentation.splash.view
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,6 +16,14 @@ import kotlinx.coroutines.delay
 
 @Composable
 fun SplashScreen(modifier: Modifier = Modifier, onNavigate: () -> Unit) {
+
+    val onDelayDone by rememberUpdatedState(onNavigate)
+
+    LaunchedEffect(key1 = true) {
+        delay(3000L)
+        onDelayDone()
+    }
+
     val isPlaying by remember {
         mutableStateOf(true)
     }
@@ -26,12 +34,6 @@ fun SplashScreen(modifier: Modifier = Modifier, onNavigate: () -> Unit) {
     val progress by animateLottieCompositionAsState(
         composition = composition, isPlaying = isPlaying, speed = speed, restartOnPlay = false
     )
-    val onDelayDone by rememberUpdatedState(onNavigate)
-
-    LaunchedEffect(key1 = true) {
-        delay(3000L)
-        onDelayDone()
-    }
 
     Box(modifier = modifier.fillMaxSize()) {
         LottieAnimation(

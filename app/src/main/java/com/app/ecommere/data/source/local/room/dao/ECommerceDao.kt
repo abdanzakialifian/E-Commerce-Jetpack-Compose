@@ -1,12 +1,10 @@
 package com.app.ecommere.data.source.local.room.dao
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 import com.app.ecommere.data.source.local.room.entity.CheckoutEntity
 import com.app.ecommere.data.source.local.room.entity.ProductEntity
 import com.app.ecommere.data.source.local.room.entity.RegisterEntity
+import com.app.ecommere.data.source.local.room.entity.TransactionEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -43,4 +41,10 @@ interface ECommerceDao {
 
     @Query("SELECT * FROM tb_register WHERE email LIKE :email")
     fun getUserData(email: String): Flow<RegisterEntity>
+
+    @Insert
+    suspend fun insertTransaction(transactionEntity: TransactionEntity)
+
+    @Query("DELETE FROM tb_checkout")
+    suspend fun deleteCheckout()
 }

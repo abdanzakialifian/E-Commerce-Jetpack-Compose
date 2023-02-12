@@ -6,10 +6,11 @@ import com.app.ecommere.data.source.local.room.dao.ECommerceDao
 import com.app.ecommere.data.source.local.room.entity.CheckoutEntity
 import com.app.ecommere.data.source.local.room.entity.ProductEntity
 import com.app.ecommere.data.source.local.room.entity.RegisterEntity
+import com.app.ecommere.data.source.local.room.entity.TransactionEntity
 
 @Database(
-    entities = [RegisterEntity::class, ProductEntity::class, CheckoutEntity::class],
-    version = 4,
+    entities = [RegisterEntity::class, ProductEntity::class, CheckoutEntity::class, TransactionEntity::class],
+    version = 5,
     exportSchema = true
 )
 abstract class ECommerceDatabase : RoomDatabase() {

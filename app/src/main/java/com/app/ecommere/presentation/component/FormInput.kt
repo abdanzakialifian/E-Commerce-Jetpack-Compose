@@ -16,6 +16,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.app.ecommere.R
+import com.app.ecommere.presentation.theme.ECommerceTheme
 
 @Composable
 fun FormInput(
@@ -63,7 +64,9 @@ fun FormInputPreview() {
     var value by remember {
         mutableStateOf("")
     }
-    FormInput(hint = stringResource(id = R.string.email_address),
-        value = value,
-        onValueChange = { value = it })
+    ECommerceTheme {
+        FormInput(hint = stringResource(id = R.string.email_address),
+            value = value,
+            onValueChange = { value = it })
+    }
 }
