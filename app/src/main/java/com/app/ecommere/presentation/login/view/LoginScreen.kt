@@ -31,6 +31,7 @@ import com.app.ecommere.presentation.component.FormInput
 import com.app.ecommere.presentation.login.viewmodel.LoginViewModel
 import com.app.ecommere.presentation.theme.ECommerceTheme
 import com.app.ecommere.utils.UiState
+import com.app.ecommere.utils.emailPattern
 
 @OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
@@ -50,12 +51,14 @@ fun LoginScreen(
         mutableStateOf("")
     }
 
+    val dataState = viewModel.getUserByEmail.collectAsStateWithLifecycle().value
+
     LaunchedEffect(key1 = Unit) {
         viewModel.setUserSession(false)
     }
 
     if (viewModel.isButtonClicked) {
-        when (val dataState = viewModel.getUserByEmail.collectAsStateWithLifecycle().value) {
+        when (dataState) {
             is UiState.Loading -> {}
             is UiState.Success -> {
                 if (dataState.data) {
@@ -95,9 +98,9 @@ fun LoginScreen(
 
 @Composable
 fun LoginContent(
-    modifier: Modifier = Modifier,
     email: String,
     password: String,
+    modifier: Modifier = Modifier,
     onEmailChange: (String) -> Unit,
     onPasswordChange: (String) -> Unit,
     onBackClicked: () -> Unit,
@@ -150,7 +153,7 @@ fun LoginContent(
                 modifier = Modifier.padding(top = 32.dp),
                 text = stringResource(id = R.string.sign_in),
                 onClick = { onSubmitClicked() },
-                enabled = email.isNotEmpty() && password.isNotEmpty()
+                enabled = email.isNotEmpty() && password.isNotEmpty() && password.length >= 6 && email.emailPattern()
             )
             Row(
                 modifier = Modifier

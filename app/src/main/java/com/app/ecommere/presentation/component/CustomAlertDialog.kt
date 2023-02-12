@@ -17,9 +17,9 @@ import com.app.ecommere.presentation.theme.ECommerceTheme
 
 @Composable
 fun CustomAlertDialog(
-    modifier: Modifier = Modifier,
     title: String,
     subTitle: String,
+    modifier: Modifier = Modifier,
     isShowNegativeButton: Boolean = false,
     onConfirmClicked: () -> Unit,
     onDismissClicked: () -> Unit
@@ -27,6 +27,7 @@ fun CustomAlertDialog(
     var isDismissDialog by remember {
         mutableStateOf(false)
     }
+
     if (!isDismissDialog) {
         AlertDialog(
             modifier = modifier,

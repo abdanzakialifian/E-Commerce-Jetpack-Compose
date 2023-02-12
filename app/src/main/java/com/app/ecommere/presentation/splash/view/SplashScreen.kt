@@ -19,7 +19,7 @@ fun SplashScreen(modifier: Modifier = Modifier, onNavigate: () -> Unit) {
 
     val onDelayDone by rememberUpdatedState(onNavigate)
 
-    LaunchedEffect(key1 = true) {
+    LaunchedEffect(true) {
         delay(3000L)
         onDelayDone()
     }
@@ -27,10 +27,13 @@ fun SplashScreen(modifier: Modifier = Modifier, onNavigate: () -> Unit) {
     val isPlaying by remember {
         mutableStateOf(true)
     }
+
     val speed by remember {
         mutableStateOf(1F)
     }
+
     val composition by rememberLottieComposition(LottieCompositionSpec.RawRes(R.raw.splash_animation))
+
     val progress by animateLottieCompositionAsState(
         composition = composition, isPlaying = isPlaying, speed = speed, restartOnPlay = false
     )

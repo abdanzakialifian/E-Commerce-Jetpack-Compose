@@ -23,4 +23,5 @@ interface ECommerceUseCase {
     fun getUserData(): Flow<String>
     fun insertTransaction(transaction: Transaction)
     fun deleteCheckout()
+    fun searchProduct(productName: String): Flow<List<Product>>
 }

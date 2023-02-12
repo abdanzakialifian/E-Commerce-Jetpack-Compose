@@ -31,6 +31,7 @@ import com.app.ecommere.presentation.checkout.viewmodel.CheckoutViewModel
 import com.app.ecommere.presentation.component.ButtonRounded
 import com.app.ecommere.presentation.component.CheckoutItem
 import com.app.ecommere.presentation.component.CustomAlertDialog
+import com.app.ecommere.presentation.theme.ECommerceTheme
 import com.app.ecommere.utils.UiState
 import com.app.ecommere.utils.formatRupiah
 import java.text.SimpleDateFormat
@@ -45,11 +46,6 @@ fun CheckoutScreen(
     onNavigateToHome: () -> Unit,
 ) {
 
-    LaunchedEffect(key1 = Unit) {
-        viewModel.getAllCheckout()
-        viewModel.getUserData()
-    }
-
     var checkouts by remember {
         mutableStateOf(listOf<Checkout>())
     }
@@ -58,30 +54,34 @@ fun CheckoutScreen(
         mutableStateOf(0)
     }
 
+    val getAllCheckoutState = viewModel.getAllCheckout.collectAsStateWithLifecycle().value
     val email = viewModel.email.collectAsStateWithLifecycle().value
 
-    when (val getAllCheckoutState = viewModel.getAllCheckout.collectAsStateWithLifecycle().value) {
-        is UiState.Loading -> {}
-        is UiState.Success -> {
-            checkouts = getAllCheckoutState.data
-            var total = 0
-            getAllCheckoutState.data.forEach {
-                total += it.subTotal ?: 0
+    LaunchedEffect(Unit) {
+        viewModel.getAllCheckout()
+        viewModel.getUserData()
+    }
+
+    LaunchedEffect(getAllCheckoutState) {
+        when (getAllCheckoutState) {
+            is UiState.Loading -> {}
+            is UiState.Success -> {
+                checkouts = getAllCheckoutState.data
+                var total = 0
+                getAllCheckoutState.data.forEach {
+                    total += it.subTotal ?: 0
+                }
+                totalPrice = total
             }
-            totalPrice = total
+            is UiState.Error -> {}
         }
-        is UiState.Error -> {}
     }
 
     if (viewModel.isButtonClicked) {
         val dateFormat = SimpleDateFormat("dd-MM-yyyy hh:mm:ss", Locale.getDefault())
         val currentDate = dateFormat.format(Date())
-
         val transaction = Transaction(
-            documentCode = "TRX",
-            user = email,
-            total = totalPrice,
-            date = currentDate
+            documentCode = "TRX", user = email, total = totalPrice, date = currentDate
         )
         viewModel.insertTransaction(transaction)
         CustomAlertDialog(
@@ -92,7 +92,8 @@ fun CheckoutScreen(
                 onNavigateToHome()
                 viewModel.isButtonClicked = false
             },
-            onDismissClicked = {})
+            onDismissClicked = {},
+        )
     }
 
     CheckoutContent(
@@ -130,7 +131,7 @@ fun CheckoutContent(
                         indication = null
                     ),
                     painter = painterResource(id = R.drawable.ic_back),
-                    contentDescription = null,
+                    contentDescription = "Icon Back",
                     colorFilter = ColorFilter.tint(color = Color.Black),
                 )
                 Text(
@@ -194,5 +195,7 @@ fun CheckoutContent(
 @Preview(showBackground = true, showSystemUi = true, device = Devices.PIXEL_4_XL)
 @Composable
 fun CheckoutScreenPreview() {
-    CheckoutScreen(onBackClicked = {}, onNavigateToHome = {})
+    ECommerceTheme {
+        CheckoutScreen(onBackClicked = {}, onNavigateToHome = {})
+    }
 }

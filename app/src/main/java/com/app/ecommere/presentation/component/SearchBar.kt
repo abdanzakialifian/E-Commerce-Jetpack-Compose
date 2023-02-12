@@ -20,9 +20,9 @@ import com.app.ecommere.presentation.theme.ECommerceTheme
 
 @Composable
 fun SearchBar(
-    modifier: Modifier = Modifier,
     hint: String,
     value: String,
+    modifier: Modifier = Modifier,
     onValueChange: (String) -> Unit
 ) {
     TextField(

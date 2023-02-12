@@ -20,9 +20,9 @@ import com.app.ecommere.presentation.theme.ECommerceTheme
 
 @Composable
 fun FormInput(
-    modifier: Modifier = Modifier,
     hint: String,
     value: String,
+    modifier: Modifier = Modifier,
     isToggleActive: Boolean = false,
     onValueChange: (String) -> Unit
 ) {
@@ -61,12 +61,11 @@ fun FormInput(
 @Preview(showBackground = true)
 @Composable
 fun FormInputPreview() {
-    var value by remember {
-        mutableStateOf("")
-    }
     ECommerceTheme {
-        FormInput(hint = stringResource(id = R.string.email_address),
-            value = value,
-            onValueChange = { value = it })
+        FormInput(
+            hint = stringResource(id = R.string.email_address),
+            value = "",
+            onValueChange = { },
+        )
     }
 }

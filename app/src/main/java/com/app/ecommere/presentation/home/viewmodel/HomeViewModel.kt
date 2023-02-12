@@ -1,5 +1,6 @@
 package com.app.ecommere.presentation.home.viewmodel
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -34,6 +35,10 @@ class HomeViewModel @Inject constructor(private val eCommerceUseCase: ECommerceU
     private val _getUserData: MutableStateFlow<UiState<Register>> =
         MutableStateFlow(UiState.Loading)
     val getUserData = _getUserData.asStateFlow()
+
+    private val _searchProduct: MutableStateFlow<UiState<List<Product>>> =
+        MutableStateFlow(UiState.Loading)
+    val searchProduct = _searchProduct.asStateFlow()
 
     var isButtonClicked by mutableStateOf(false)
 
@@ -93,6 +98,14 @@ class HomeViewModel @Inject constructor(private val eCommerceUseCase: ECommerceU
         viewModelScope.launch {
             eCommerceUseCase.getUserData(email).collect { data ->
                 _getUserData.value = UiState.Success(data)
+            }
+        }
+    }
+
+    fun searchProduct(productName: String) {
+        viewModelScope.launch {
+            eCommerceUseCase.searchProduct(productName).collect { products ->
+                _searchProduct.value = UiState.Success(products)
             }
         }
     }

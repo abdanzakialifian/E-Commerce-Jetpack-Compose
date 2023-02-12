@@ -24,12 +24,12 @@ import com.app.ecommere.presentation.theme.ECommerceTheme
 
 @Composable
 fun CheckoutItem(
-    modifier: Modifier = Modifier,
     painter: Painter,
     productName: String,
     productQuantity: Int,
     productUnit: String,
-    subTotal: String
+    subTotal: String,
+    modifier: Modifier = Modifier,
 ) {
     Row(
         modifier = modifier
@@ -41,11 +41,13 @@ fun CheckoutItem(
                 .size(120.dp)
                 .padding(10.dp),
             painter = painter,
-            contentDescription = null
+            contentDescription = "Image Product"
         )
-        Column(modifier = Modifier
-            .padding(start = 10.dp)
-            .align(Alignment.CenterVertically)) {
+        Column(
+            modifier = Modifier
+                .padding(start = 10.dp)
+                .align(Alignment.CenterVertically)
+        ) {
             Text(text = productName, fontWeight = FontWeight.Bold, fontSize = 18.sp)
             Row(modifier = Modifier.padding(top = 4.dp)) {
                 Card(

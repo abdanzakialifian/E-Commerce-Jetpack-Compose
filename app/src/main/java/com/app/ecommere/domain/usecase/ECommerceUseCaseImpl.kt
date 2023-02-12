@@ -59,4 +59,7 @@ class ECommerceUseCaseImpl @Inject constructor(private val eCommerceRepository: 
     override fun deleteCheckout() {
         eCommerceRepository.deleteCheckout()
     }
+
+    override fun searchProduct(productName: String): Flow<List<Product>> =
+        eCommerceRepository.searchProduct(productName)
 }

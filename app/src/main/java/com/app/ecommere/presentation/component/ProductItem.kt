@@ -29,12 +29,12 @@ import com.app.ecommere.presentation.theme.ECommerceTheme
 
 @Composable
 fun ProductItem(
-    modifier: Modifier = Modifier,
     image: Painter,
     title: String,
     description: String,
     discount: String,
     price: String,
+    modifier: Modifier = Modifier,
     onItemClicked: () -> Unit,
     onAddClicked: () -> Unit
 ) {

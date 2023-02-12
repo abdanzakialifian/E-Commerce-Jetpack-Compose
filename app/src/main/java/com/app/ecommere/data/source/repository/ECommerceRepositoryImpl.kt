@@ -1,5 +1,6 @@
 package com.app.ecommere.data.source.repository
 
+import android.util.Log
 import com.app.ecommere.data.source.local.LocalDataSource
 import com.app.ecommere.domain.interfaces.ECommerceRepository
 import com.app.ecommere.domain.model.Checkout
@@ -73,4 +74,12 @@ class ECommerceRepositoryImpl @Inject constructor(private val localDataSource: L
     override fun deleteCheckout() {
         localDataSource.deleteCheckout()
     }
+
+    override fun searchProduct(productName: String): Flow<List<Product>> =
+        localDataSource.getAllProduct().map {
+            val mapper = DataMapper.mapProductEntityToProduct(it)
+            mapper.filter { product ->
+                product.productName?.contains(productName, ignoreCase = true) ?: false
+            }
+        }
 }

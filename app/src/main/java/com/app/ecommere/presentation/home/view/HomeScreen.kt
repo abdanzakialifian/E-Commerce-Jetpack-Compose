@@ -1,5 +1,6 @@
 package com.app.ecommere.presentation.home.view
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -49,15 +50,13 @@ fun HomeScreen(
     viewModel: HomeViewModel = viewModel(),
     onShoppingBagClicked: () -> Unit,
     onItemClicked: (Int) -> Unit,
-    onLogoutClicked: () -> Unit
+    onLogoutClicked: () -> Unit,
+    onPhysicalBackClicked: () -> Unit,
 ) {
-    LaunchedEffect(key1 = Unit) {
-        viewModel.getAllProduct()
-        viewModel.setUserSession(true)
-        viewModel.getUserData()
-    }
 
-    viewModel.getCheckoutCount()
+    BackHandler {
+        onPhysicalBackClicked()
+    }
 
     var checkout by remember {
         mutableStateOf(Checkout())
@@ -75,51 +74,84 @@ fun HomeScreen(
         mutableStateOf(listOf<Product>())
     }
 
+    var filterProducts by remember {
+        mutableStateOf(listOf<Product>())
+    }
+
     var name by remember {
         mutableStateOf("")
     }
 
-    when (val getUserDataState = viewModel.getUserData.collectAsStateWithLifecycle().value) {
-        is UiState.Loading -> {}
-        is UiState.Success -> name = getUserDataState.data.name ?: ""
-        is UiState.Error -> {}
+    val getUserDataState = viewModel.getUserData.collectAsStateWithLifecycle().value
+    val getCheckoutCountState = viewModel.getCheckoutCount.collectAsStateWithLifecycle().value
+    val getAllProductState = viewModel.getAllProduct.collectAsStateWithLifecycle().value
+    val getProductByProductCodeState =
+        viewModel.getProductByProductCode.collectAsStateWithLifecycle().value
+    val searchProductState = viewModel.searchProduct.collectAsStateWithLifecycle().value
+
+    LaunchedEffect(Unit) {
+        viewModel.getAllProduct()
+        viewModel.setUserSession(true)
+        viewModel.getUserData()
     }
 
-    when (val getCheckoutCountState =
-        viewModel.getCheckoutCount.collectAsStateWithLifecycle().value) {
-        is UiState.Loading -> {}
-        is UiState.Success -> count = getCheckoutCountState.data
-        is UiState.Error -> {}
-    }
+    viewModel.getCheckoutCount()
 
-    when (val getAllProductState = viewModel.getAllProduct.collectAsStateWithLifecycle().value) {
-        is UiState.Loading -> {}
-        is UiState.Success -> products = getAllProductState.data
-        is UiState.Error -> {}
-    }
-
-    if (viewModel.isButtonClicked) {
-        when (val getProductByProductCodeState =
-            viewModel.getProductByProductCode.collectAsStateWithLifecycle().value) {
+    LaunchedEffect(getUserDataState) {
+        when (getUserDataState) {
             is UiState.Loading -> {}
-            is UiState.Success -> {
-                if (getProductByProductCodeState.data) {
-                    viewModel.updateProductByProductCode(
-                        productCode = checkout.productCode ?: "",
-                        productQuantity = checkout.productQuantity ?: 0
-                    )
-                    viewModel.isButtonClicked = false
-                } else {
-                    viewModel.insertCheckout(checkout)
-                    viewModel.isButtonClicked = false
-                }
-            }
+            is UiState.Success -> name = getUserDataState.data.name ?: ""
             is UiState.Error -> {}
         }
     }
 
+    LaunchedEffect(getCheckoutCountState) {
+        when (getCheckoutCountState) {
+            is UiState.Loading -> {}
+            is UiState.Success -> count = getCheckoutCountState.data
+            is UiState.Error -> {}
+        }
+    }
+
+    LaunchedEffect(getAllProductState) {
+        when (getAllProductState) {
+            is UiState.Loading -> {}
+            is UiState.Success -> products = getAllProductState.data
+            is UiState.Error -> {}
+        }
+    }
+
+    LaunchedEffect(searchProductState) {
+        when (searchProductState) {
+            is UiState.Loading -> {}
+            is UiState.Success -> filterProducts = searchProductState.data
+            is UiState.Error -> {}
+        }
+    }
+
+    LaunchedEffect(viewModel.isButtonClicked) {
+        if (viewModel.isButtonClicked) {
+            when (getProductByProductCodeState) {
+                is UiState.Loading -> {}
+                is UiState.Success -> {
+                    if (getProductByProductCodeState.data) {
+                        viewModel.updateProductByProductCode(
+                            productCode = checkout.productCode ?: "",
+                            productQuantity = checkout.productQuantity ?: 0
+                        )
+                    } else {
+                        viewModel.insertCheckout(checkout)
+                    }
+                    viewModel.isButtonClicked = false
+                }
+                is UiState.Error -> {}
+            }
+        }
+    }
+
     if (viewModel.isLogoutClicked) {
-        CustomAlertDialog(title = stringResource(id = R.string.logout),
+        CustomAlertDialog(
+            title = stringResource(id = R.string.logout),
             subTitle = stringResource(
                 id = R.string.sub_title_logout
             ),
@@ -128,17 +160,20 @@ fun HomeScreen(
                 onLogoutClicked()
                 viewModel.isLogoutClicked = false
             },
-            onDismissClicked = { viewModel.isLogoutClicked = false })
-
+            onDismissClicked = { viewModel.isLogoutClicked = false },
+        )
     }
 
     HomeContent(
+        products = if (search.isNotEmpty()) filterProducts else products,
+        search = search,
+        count = count,
+        name = name,
         modifier = modifier,
-        products,
-        search,
-        count,
-        name,
-        onSearchChange = { search = it },
+        onSearchChange = {
+            search = it
+            viewModel.searchProduct(it)
+        },
         onAddClicked = { product ->
             checkout = Checkout(
                 documentNumber = "00${product.productId}",
@@ -163,11 +198,11 @@ fun HomeScreen(
 
 @Composable
 fun HomeContent(
-    modifier: Modifier = Modifier,
     products: List<Product>,
     search: String,
     count: Int,
     name: String,
+    modifier: Modifier = Modifier,
     onSearchChange: (String) -> Unit,
     onAddClicked: (Product) -> Unit,
     onShoppingBagClicked: () -> Unit,
@@ -307,6 +342,8 @@ fun HomeScreenPreview() {
         HomeScreen(
             onShoppingBagClicked = {},
             onItemClicked = {},
-            onLogoutClicked = {})
+            onLogoutClicked = {},
+            onPhysicalBackClicked = {}
+        )
     }
 }

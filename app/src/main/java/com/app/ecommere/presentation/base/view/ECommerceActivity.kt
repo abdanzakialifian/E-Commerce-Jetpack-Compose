@@ -35,6 +35,7 @@ import com.app.ecommere.presentation.register.view.RegisterScreen
 import com.app.ecommere.presentation.register.viewmodel.RegisterViewModel
 import com.app.ecommere.presentation.splash.view.SplashScreen
 import com.app.ecommere.presentation.theme.ECommerceTheme
+import com.app.ecommere.utils.Argument
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -54,11 +55,12 @@ class ECommerceActivity : ComponentActivity() {
     }
 }
 
+
 @OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
 fun ECommerceApp(vm: ECommerceViewModel = viewModel()) {
 
-    LaunchedEffect(key1 = Unit) {
+    LaunchedEffect(Unit) {
         vm.getUserSession()
     }
 
@@ -119,13 +121,8 @@ fun ECommerceApp(vm: ECommerceViewModel = viewModel()) {
                     navController.navigate(Screen.CheckoutScreen.route)
                 },
                 onItemClicked = { navController.navigate(Screen.DetailScreen.createRoute(it)) },
-                onLogoutClicked = {
-                    navController.navigate(Screen.LoginScreen.route) {
-                        popUpTo(Screen.SplashScreen.route) {
-                            inclusive = true
-                        }
-                    }
-                },
+                onLogoutClicked = { navController.navigate(Screen.LoginScreen.route) },
+                onPhysicalBackClicked = { activity?.finish() }
             )
         }
         composable(route = Screen.CheckoutScreen.route) {
@@ -133,20 +130,14 @@ fun ECommerceApp(vm: ECommerceViewModel = viewModel()) {
             CheckoutScreen(
                 viewModel = viewModel,
                 onBackClicked = { navController.navigateUp() },
-                onNavigateToHome = {
-                    navController.navigate(Screen.HomeScreen.route) {
-                        popUpTo(Screen.HomeScreen.route) {
-                            inclusive = true
-                        }
-                    }
-                })
+                onNavigateToHome = { navController.navigate(Screen.HomeScreen.route) })
         }
         composable(
             route = Screen.DetailScreen.route,
-            arguments = listOf(navArgument("productId") { type = NavType.IntType })
+            arguments = listOf(navArgument(Argument.PRODUCT_ID) { type = NavType.IntType })
         ) {
             val viewModel = hiltViewModel<DetailViewModel>()
-            val productId = it.arguments?.getInt("productId")
+            val productId = it.arguments?.getInt(Argument.PRODUCT_ID)
             DetailScreen(
                 viewModel = viewModel,
                 productId = productId ?: 0,
@@ -159,5 +150,7 @@ fun ECommerceApp(vm: ECommerceViewModel = viewModel()) {
 @Preview(showBackground = true)
 @Composable
 fun ECommercePreview() {
-    ECommerceApp()
+    ECommerceTheme {
+        ECommerceApp()
+    }
 }

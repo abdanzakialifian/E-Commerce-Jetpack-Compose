@@ -33,23 +33,19 @@ import com.app.ecommere.R
 import com.app.ecommere.domain.model.Checkout
 import com.app.ecommere.presentation.component.ButtonRounded
 import com.app.ecommere.presentation.detail.viewmodel.DetailViewModel
+import com.app.ecommere.presentation.theme.ECommerceTheme
 import com.app.ecommere.utils.UiState
 import com.app.ecommere.utils.formatRupiah
 
 @OptIn(ExperimentalLifecycleComposeApi::class)
 @Composable
 fun DetailScreen(
+    productId: Int,
     modifier: Modifier = Modifier,
     viewModel: DetailViewModel = viewModel(),
-    productId: Int,
     onBackClicked: () -> Unit,
     onShoppingBagClicked: () -> Unit
 ) {
-
-    LaunchedEffect(key1 = Unit) {
-        viewModel.getProductById(productId)
-        viewModel.getCheckoutCount()
-    }
 
     var count by remember {
         mutableStateOf(0)
@@ -91,36 +87,49 @@ fun DetailScreen(
         mutableStateOf(Checkout())
     }
 
-    when (val getProductByIdState = viewModel.getProductById.collectAsState().value) {
-        is UiState.Loading -> {}
-        is UiState.Success -> {
-            val data = getProductByIdState.data
-            imageName = data.imageName ?: ""
-            productName = data.productName ?: ""
-            productDescription = data.description ?: ""
-            productDiscount = data.discount ?: 0
-            productPrice = data.productPrice ?: 0
-            productCode = data.productCode ?: ""
-            unit = data.unit ?: ""
-            currency = data.currency ?: ""
-        }
-        is UiState.Error -> {}
+    val getProductByIdState = viewModel.getProductById.collectAsStateWithLifecycle().value
+    val getCheckoutCountState = viewModel.getCheckoutCount.collectAsStateWithLifecycle().value
+    val getProductByProductCodeState =
+        viewModel.getProductByProductCode.collectAsStateWithLifecycle().value
+
+    LaunchedEffect(Unit) {
+        viewModel.getProductById(productId)
     }
 
-    when (val getCheckoutCountState = viewModel.getCheckoutCount.collectAsState().value) {
-        is UiState.Loading -> {}
-        is UiState.Success -> {
-            count = getCheckoutCountState.data
+    viewModel.getCheckoutCount()
+
+    LaunchedEffect(getProductByIdState) {
+        when (getProductByIdState) {
+            is UiState.Loading -> {}
+            is UiState.Success -> {
+                val data = getProductByIdState.data
+                imageName = data.imageName ?: ""
+                productName = data.productName ?: ""
+                productDescription = data.description ?: ""
+                productDiscount = data.discount ?: 0
+                productPrice = data.productPrice ?: 0
+                productCode = data.productCode ?: ""
+                unit = data.unit ?: ""
+                currency = data.currency ?: ""
+            }
+            is UiState.Error -> {}
         }
-        is UiState.Error -> {}
+    }
+
+    LaunchedEffect(getCheckoutCountState) {
+        when (getCheckoutCountState) {
+            is UiState.Loading -> {}
+            is UiState.Success -> {
+                count = getCheckoutCountState.data
+            }
+            is UiState.Error -> {}
+        }
     }
 
     if (viewModel.isButtonClicked) {
-        when (val getProductByProductCodeState =
-            viewModel.getProductByProductCode.collectAsStateWithLifecycle().value) {
+        when (getProductByProductCodeState) {
             is UiState.Loading -> {}
             is UiState.Success -> {
-                onShoppingBagClicked()
                 if (getProductByProductCodeState.data) {
                     viewModel.updateProductByProductCode(
                         productCode = productCode,
@@ -129,6 +138,7 @@ fun DetailScreen(
                 } else {
                     viewModel.insertCheckout(checkout)
                 }
+                onShoppingBagClicked()
                 viewModel.isButtonClicked = false
             }
             is UiState.Error -> {}
@@ -136,7 +146,7 @@ fun DetailScreen(
     }
 
     DetailContent(
-        modifier,
+        modifier = modifier,
         count = count,
         imageName = imageName,
         productName = productName,
@@ -166,13 +176,13 @@ fun DetailScreen(
 
 @Composable
 fun DetailContent(
-    modifier: Modifier = Modifier,
     count: Int,
     imageName: String,
     productName: String,
     productDescription: String,
     productDiscount: Int,
     productPrice: Int,
+    modifier: Modifier = Modifier,
     onBackClicked: () -> Unit,
     onShoppingBagClicked: () -> Unit,
     onButtonClicked: () -> Unit,
@@ -204,7 +214,7 @@ fun DetailContent(
                             indication = null
                         ),
                     painter = painterResource(id = R.drawable.ic_back),
-                    contentDescription = null,
+                    contentDescription = "Icon Back",
                     colorFilter = ColorFilter.tint(color = Color.Black),
                 )
                 Text(
@@ -268,7 +278,7 @@ fun DetailContent(
                     .align(Alignment.CenterHorizontally)
                     .padding(top = 20.dp),
                 painter = painterResource(id = drawableId),
-                contentDescription = null
+                contentDescription = "Image Detail"
             )
             Text(text = productName, fontWeight = FontWeight.Bold, fontSize = 18.sp)
             Text(
@@ -310,5 +320,7 @@ fun DetailContent(
 @Preview(showBackground = true, showSystemUi = true, device = Devices.PIXEL_4_XL)
 @Composable
 fun DetailScreenPreview() {
-    DetailScreen(productId = 0, onBackClicked = {}, onShoppingBagClicked = {})
+    ECommerceTheme {
+        DetailScreen(productId = 0, onBackClicked = {}, onShoppingBagClicked = {})
+    }
 }

@@ -20,10 +20,10 @@ import com.app.ecommere.presentation.theme.ECommerceTheme
 
 @Composable
 fun ButtonRounded(
-    modifier: Modifier = Modifier,
     text: String,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = false,
     onClick: () -> Unit,
-    enabled: Boolean = false
 ) {
     Button(
         modifier = modifier.fillMaxWidth(),

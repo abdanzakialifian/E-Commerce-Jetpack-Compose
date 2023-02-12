@@ -29,6 +29,7 @@ import com.app.ecommere.presentation.component.CustomAlertDialog
 import com.app.ecommere.presentation.component.FormInput
 import com.app.ecommere.presentation.register.viewmodel.RegisterViewModel
 import com.app.ecommere.presentation.theme.ECommerceTheme
+import com.app.ecommere.utils.emailPattern
 
 @Composable
 fun RegisterScreen(
@@ -84,10 +85,10 @@ fun RegisterScreen(
 
 @Composable
 fun RegisterContent(
-    modifier: Modifier = Modifier,
     name: String,
     email: String,
     password: String,
+    modifier: Modifier = Modifier,
     onNameChange: (String) -> Unit,
     onEmailChange: (String) -> Unit,
     onPassword: (String) -> Unit,
@@ -156,7 +157,7 @@ fun RegisterContent(
                 modifier = Modifier.padding(top = 32.dp),
                 text = stringResource(id = R.string.sign_up),
                 onClick = onSignupClicked,
-                enabled = name.isNotEmpty() && email.isNotEmpty() && password.isNotEmpty()
+                enabled = name.isNotEmpty() && email.isNotEmpty() && password.isNotEmpty() && password.length >= 6 && email.emailPattern()
             )
             Row(
                 modifier = Modifier

@@ -12,6 +12,7 @@ import javax.inject.Inject
 @HiltViewModel
 class RegisterViewModel @Inject constructor(private val eCommerceUseCase: ECommerceUseCase) :
     ViewModel() {
+
     var isButtonClicked by mutableStateOf(false)
 
     fun insertUserRegister(register: Register) {
