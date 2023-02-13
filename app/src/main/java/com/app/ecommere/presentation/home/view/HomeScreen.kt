@@ -129,23 +129,21 @@ fun HomeScreen(
         }
     }
 
-    LaunchedEffect(viewModel.isButtonClicked) {
-        if (viewModel.isButtonClicked) {
-            when (getProductByProductCodeState) {
-                is UiState.Loading -> {}
-                is UiState.Success -> {
-                    if (getProductByProductCodeState.data) {
-                        viewModel.updateProductByProductCode(
-                            productCode = checkout.productCode ?: "",
-                            productQuantity = checkout.productQuantity ?: 0
-                        )
-                    } else {
-                        viewModel.insertCheckout(checkout)
-                    }
-                    viewModel.isButtonClicked = false
+    if (viewModel.isButtonClicked) {
+        when (getProductByProductCodeState) {
+            is UiState.Loading -> {}
+            is UiState.Success -> {
+                if (getProductByProductCodeState.data) {
+                    viewModel.updateProductByProductCode(
+                        productCode = checkout.productCode ?: "",
+                        productQuantity = checkout.productQuantity ?: 0
+                    )
+                } else {
+                    viewModel.insertCheckout(checkout)
                 }
-                is UiState.Error -> {}
+                viewModel.isButtonClicked = false
             }
+            is UiState.Error -> {}
         }
     }
 
@@ -175,6 +173,9 @@ fun HomeScreen(
             viewModel.searchProduct(it)
         },
         onAddClicked = { product ->
+            val discount = (product.productPrice?.div(100))?.times(product.discount ?: 0)
+            val price = product.productPrice?.minus(discount ?: 0)
+
             checkout = Checkout(
                 documentNumber = "00${product.productId}",
                 documentCode = "TRX",
@@ -182,7 +183,7 @@ fun HomeScreen(
                 productPrice = product.productPrice,
                 productQuantity = 1,
                 unit = product.unit,
-                subTotal = product.productPrice,
+                subTotal = price,
                 currency = product.currency,
                 imageName = product.imageName,
                 productName = product.productName
@@ -325,7 +326,7 @@ fun HomeContent(
 
                 ProductItem(image = painterResource(id = drawableId),
                     title = product.productName ?: "",
-                    description = product.description ?: "",
+                    description = product.subTitle ?: "",
                     discount = discount?.toDouble()?.formatRupiah() ?: "",
                     price = price?.toDouble()?.formatRupiah() ?: "",
                     onItemClicked = { onItemClicked(product.productId ?: 0) },

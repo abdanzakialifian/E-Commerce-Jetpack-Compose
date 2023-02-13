@@ -32,6 +32,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.app.ecommere.R
 import com.app.ecommere.domain.model.Checkout
 import com.app.ecommere.presentation.component.ButtonRounded
+import com.app.ecommere.presentation.component.CountItem
 import com.app.ecommere.presentation.detail.viewmodel.DetailViewModel
 import com.app.ecommere.presentation.theme.ECommerceTheme
 import com.app.ecommere.utils.UiState
@@ -71,6 +72,10 @@ fun DetailScreen(
         mutableStateOf(0)
     }
 
+    var tempProductPrice by remember {
+        mutableStateOf(0)
+    }
+
     var productCode by remember {
         mutableStateOf("")
     }
@@ -85,6 +90,10 @@ fun DetailScreen(
 
     var checkout by remember {
         mutableStateOf(Checkout())
+    }
+
+    var productCount by remember {
+        mutableStateOf(1)
     }
 
     val getProductByIdState = viewModel.getProductById.collectAsStateWithLifecycle().value
@@ -108,6 +117,7 @@ fun DetailScreen(
                 productDescription = data.description ?: ""
                 productDiscount = data.discount ?: 0
                 productPrice = data.productPrice ?: 0
+                tempProductPrice = data.productPrice ?: 0
                 productCode = data.productCode ?: ""
                 unit = data.unit ?: ""
                 currency = data.currency ?: ""
@@ -133,7 +143,7 @@ fun DetailScreen(
                 if (getProductByProductCodeState.data) {
                     viewModel.updateProductByProductCode(
                         productCode = productCode,
-                        productQuantity = checkout.productQuantity ?: 0
+                        productQuantity = productCount
                     )
                 } else {
                     viewModel.insertCheckout(checkout)
@@ -152,24 +162,38 @@ fun DetailScreen(
         productName = productName,
         productDescription = productDescription,
         productDiscount = productDiscount,
-        productPrice = productPrice,
+        productPrice = if (productCount != 1) tempProductPrice else productPrice,
+        productCount = productCount,
         onBackClicked = onBackClicked,
         onShoppingBagClicked = onShoppingBagClicked,
         onButtonClicked = {
+            val discount = (tempProductPrice / 100) * productDiscount
+            val price = tempProductPrice.minus(discount)
+
             checkout = Checkout(
                 documentNumber = "00${productId}",
                 documentCode = "TRX",
                 productCode = productCode,
                 productPrice = productPrice,
-                productQuantity = 1,
+                productQuantity = productCount,
                 unit = unit,
-                subTotal = productPrice,
+                subTotal = price,
                 currency = currency,
                 imageName = imageName,
                 productName = productName
             )
             viewModel.getProductByProductCode(productCode)
             viewModel.isButtonClicked = true
+        },
+        onDeleteClicked = {
+            if (productCount != 1) {
+                productCount -= 1
+                tempProductPrice -= productPrice
+            }
+        },
+        onAddClicked = {
+            productCount += 1
+            tempProductPrice += productPrice
         }
     )
 }
@@ -182,10 +206,13 @@ fun DetailContent(
     productDescription: String,
     productDiscount: Int,
     productPrice: Int,
+    productCount: Int,
     modifier: Modifier = Modifier,
     onBackClicked: () -> Unit,
     onShoppingBagClicked: () -> Unit,
     onButtonClicked: () -> Unit,
+    onDeleteClicked: () -> Unit,
+    onAddClicked: () -> Unit
 ) {
     val interactionSource = remember { MutableInteractionSource() }
 
@@ -280,32 +307,49 @@ fun DetailContent(
                 painter = painterResource(id = drawableId),
                 contentDescription = "Image Detail"
             )
-            Text(text = productName, fontWeight = FontWeight.Bold, fontSize = 18.sp)
             Text(
-                modifier = Modifier.padding(top = 8.dp),
+                modifier = Modifier.padding(top = 10.dp),
+                text = productName,
+                fontWeight = FontWeight.Bold,
+                fontSize = 22.sp
+            )
+            Text(
+                modifier = Modifier.padding(top = 10.dp),
                 text = productDescription,
                 fontSize = 14.sp,
-                color = Color.Gray
+                color = Color.Gray,
+                lineHeight = 20.sp
             )
-            val discount = ((productPrice / 100) * productDiscount)
-            val price = (productPrice.minus(discount))
+            val discount = (productPrice / 100) * productDiscount
+            val price = productPrice.minus(discount)
 
             if (discount != 0) {
                 Text(
-                    modifier = Modifier.padding(top = 8.dp),
+                    modifier = Modifier.padding(top = 16.dp),
                     text = discount.toDouble().formatRupiah(),
                     color = Color.Gray,
-                    fontSize = 12.sp,
+                    fontSize = 14.sp,
                     style = TextStyle(textDecoration = TextDecoration.LineThrough)
                 )
             }
-            Text(
-                modifier = Modifier.padding(top = 8.dp),
-                text = price.toDouble().formatRupiah(),
-                fontWeight = FontWeight.Bold,
-                fontSize = 14.sp,
-                color = Color.Black
-            )
+            Row(
+                modifier = Modifier
+                    .padding(top = if (discount != 0) 6.dp else 16.dp)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = price.toDouble().formatRupiah(),
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 20.sp,
+                    color = Color.Black
+                )
+                CountItem(
+                    count = productCount.toString(),
+                    onDeleteClicked = onDeleteClicked,
+                    onAddClicked = onAddClicked
+                )
+            }
         }
 
         ButtonRounded(

@@ -19,5 +19,7 @@ data class Product(
 
     val imageName: String? = null,
 
+    val subTitle: String? = null,
+
     val description: String? = null
 )

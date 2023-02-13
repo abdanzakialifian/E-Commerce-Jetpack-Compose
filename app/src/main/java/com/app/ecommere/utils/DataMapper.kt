@@ -27,6 +27,7 @@ object DataMapper {
                     dimension = data.dimension,
                     unit = data.unit,
                     imageName = data.imageName,
+                    subTitle = data.subTitle,
                     description = data.description
                 )
             )

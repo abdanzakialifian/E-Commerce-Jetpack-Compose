@@ -34,6 +34,9 @@ data class ProductEntity(
     @ColumnInfo("image_name")
     val imageName: String? = null,
 
+    @ColumnInfo("sub_title")
+    val subTitle: String? = null,
+
     @ColumnInfo("description")
     val description: String? = null
 )
