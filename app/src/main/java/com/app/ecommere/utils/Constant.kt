@@ -7,6 +7,7 @@ object Route {
     const val HOME_ROUTE = "home_screen"
     const val CHECKOUT_ROUTE = "checkout_screen"
     const val DETAIL_ROUTE = "detail_screen/{${Argument.PRODUCT_ID}}"
+    const val ABOUT_ROUTE = "about_screen"
 }
 
 object Argument {

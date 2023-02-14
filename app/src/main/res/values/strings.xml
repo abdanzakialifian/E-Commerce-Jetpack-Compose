@@ -26,4 +26,6 @@
     <string name="sub_title_checkout">Payment successful. The goods will be delivered soon.</string>
     <string name="logout">Logout</string>
     <string name="sub_title_logout">Are you sure you want to logout?</string>
+    <string name="name_developer">Abdan Zaki Alifian</string>
+    <string name="email_developer">abdanzakialifian99@gmail.com</string>
 </resources>

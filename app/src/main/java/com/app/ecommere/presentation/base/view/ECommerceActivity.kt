@@ -21,6 +21,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.app.ecommere.presentation.about.view.AboutScreen
 import com.app.ecommere.presentation.base.viewmode.ECommerceViewModel
 import com.app.ecommere.presentation.checkout.view.CheckoutScreen
 import com.app.ecommere.presentation.checkout.viewmodel.CheckoutViewModel
@@ -143,6 +144,10 @@ fun ECommerceApp(vm: ECommerceViewModel = viewModel()) {
                 productId = productId ?: 0,
                 onBackClicked = { navController.navigateUp() },
                 onShoppingBagClicked = { navController.navigate(Screen.CheckoutScreen.route) })
+        }
+
+        composable(route = Screen.AboutScreen.route) {
+            AboutScreen(onLogoutClicked = {})
         }
     }
 }

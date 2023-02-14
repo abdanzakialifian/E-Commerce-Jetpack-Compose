@@ -14,6 +14,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Logout
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.PersonOutline
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -293,10 +295,10 @@ fun HomeContent(
                     Image(
                         modifier = Modifier
                             .padding(10.dp)
-                            .size(16.dp)
+                            .size(18.dp)
                             .align(Alignment.Center),
-                        imageVector = Icons.Filled.Logout,
-                        contentDescription = "Shopping Bag",
+                        imageVector = Icons.Default.PersonOutline,
+                        contentDescription = "About",
                     )
 
                 }
